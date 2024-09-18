@@ -410,6 +410,9 @@ export class StampRepository {
     try {
       const xcp_balances = await XcpManager.getXcpBalancesByAddress(address);
       const assets = xcp_balances.map((balance: XCPBalance) => balance.cpid);
+      if (assets.length === 0) {
+        return [];
+      }
 
       const query = `
         SELECT 
@@ -434,8 +437,8 @@ export class StampRepository {
         assets.map((asset: string) => `'${asset}'`).join(", ")
       } )
         ORDER BY st.stamp ${order}
-        LIMIT '${limit}'
-        OFFSET '${offset};
+        LIMIT ${limit}
+        OFFSET ${offset};
       `;
 
       const balances = await dbManager.executeQueryWithCache(
