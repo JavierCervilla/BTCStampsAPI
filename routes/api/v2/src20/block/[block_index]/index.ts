@@ -8,6 +8,9 @@ export const handler: Handlers = {
       const { block_index } = ctx.params;
       const params = {
         block_index: parseInt(block_index, 10),
+        sort: (url.searchParams.get("sort")?.toUpperCase() as "ASC" | "DESC") || "ASC",
+        limit: parseInt(url.searchParams.get("limit") || "100", 10),
+        page: parseInt(url.searchParams.get("page") || "1", 10),
       };
 
       const result = await Src20Controller.handleSrc20TransactionsRequest(
