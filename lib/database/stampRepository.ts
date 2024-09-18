@@ -414,7 +414,8 @@ export class StampRepository {
       const query = `
         SELECT 
           st.cpid, 
-          st.tx_index, 
+          st.stamp, 
+          st.tx_index,
           st.stamp_base64,
           st.stamp_url, 
           st.stamp_mimetype, 
@@ -432,7 +433,7 @@ export class StampRepository {
           st.cpid IN ( ${
         assets.map((asset: string) => `'${asset}'`).join(", ")
       } )
-        ORDER BY st.tx_index ${order}
+        ORDER BY st.stamp ${order}
         LIMIT ${limit}
         OFFSET ${offset};
       `;
