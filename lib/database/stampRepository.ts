@@ -434,8 +434,8 @@ export class StampRepository {
         assets.map((asset: string) => `'${asset}'`).join(", ")
       } )
         ORDER BY st.stamp ${order}
-        LIMIT ${limit}
-        OFFSET ${offset};
+        LIMIT '${limit}'
+        OFFSET '${offset}' ;
       `;
 
       const balances = await dbManager.executeQueryWithCache(
