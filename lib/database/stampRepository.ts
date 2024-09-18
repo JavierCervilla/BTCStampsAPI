@@ -435,7 +435,7 @@ export class StampRepository {
       } )
         ORDER BY st.stamp ${order}
         LIMIT '${limit}'
-        OFFSET '${offset}' ;
+        OFFSET '${offset};
       `;
 
       const balances = await dbManager.executeQueryWithCache(
