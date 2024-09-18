@@ -9,6 +9,7 @@ interface ServerConfig {
   CSRF_SECRET_KEY?: string;
   MINTING_SERVICE_FEE_ENABLED: string;
   MINTING_SERVICE_FEE_FIXED_SATS: string;
+  SKIP_REDIS_CONNECTION: string;
   [key: string]: string | undefined;
 }
 
