@@ -1,11 +1,6 @@
 import { AppProps } from "$fresh/server.ts";
-import { Partial } from "$fresh/runtime.ts";
 
 import { Head } from "$fresh/runtime.ts";
-import { Header } from "$islands/Header.tsx";
-import { Footer } from "$islands/Footer.tsx";
-import { ToastProvider } from "$islands/Toast/toast.tsx";
-import { NavigatorProvider } from "$islands/Navigator/navigator.tsx";
 
 export default function App({ Component }: AppProps) {
   const defaultTitle = "Bitcoin Stamps";
@@ -68,22 +63,7 @@ export default function App({ Component }: AppProps) {
         />
       </Head>
       <body className="bg-[#0B0B0B] min-h-screen flex flex-col justify-between font-['Work_Sans']">
-        <ToastProvider>
-          <NavigatorProvider>
-            <div className="flex flex-col min-h-screen">
-              <div
-                className="px-2 pt-8 mx-auto flex flex-col gap-5 max-w-7xl w-full flex-grow"
-                f-client-nav
-              >
-                <Header />
-                <Partial name="body">
-                  <Component />
-                </Partial>
-              </div>
-              <Footer />
-            </div>
-          </NavigatorProvider>
-        </ToastProvider>
+        <Component />
       </body>
     </html>
   );
