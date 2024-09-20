@@ -3,6 +3,8 @@ import { Handlers } from "$fresh/server.ts";
 import { Src20Controller } from "$lib/controller/src20Controller.ts";
 import { StampController } from "$lib/controller/stampController.ts";
 import { ResponseUtil } from "utils/responseUtil.ts";
+import { electrumManager } from "utils/electrum.ts";
+
 import { SRC20TrxRequestParams } from "globals";
 
 export const handler: Handlers = {
