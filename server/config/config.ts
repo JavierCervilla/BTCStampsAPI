@@ -23,7 +23,7 @@ let serverConfig: ServerConfig = {
   MINTING_SERVICE_FEE_ENABLED: "0",
   MINTING_SERVICE_FEE_FIXED_SATS: "0",
   ELECTRUM:{
-    HOST: "indexer.srcpad.pro/electrs",
+    HOST: "https://indexer.srcpad.pro/electrs",
     PORT: 443
   }
 };
