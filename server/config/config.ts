@@ -10,6 +10,10 @@ interface ServerConfig {
   MINTING_SERVICE_FEE_ENABLED: string;
   MINTING_SERVICE_FEE_FIXED_SATS: string;
   SKIP_REDIS_CONNECTION: string;
+  ELECTRUM:{
+    HOST: string,
+    PORT: number
+  };
   [key: string]: string | undefined;
 }
 
@@ -18,6 +22,10 @@ let serverConfig: ServerConfig = {
   APP_ROOT: "",
   MINTING_SERVICE_FEE_ENABLED: "0",
   MINTING_SERVICE_FEE_FIXED_SATS: "0",
+  ELECTRUM:{
+    HOST: "indexer.srcpad.pro/electrs",
+    PORT: 443
+  }
 };
 
 const isDeno = typeof Deno !== "undefined";
