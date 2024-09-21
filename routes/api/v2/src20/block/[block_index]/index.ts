@@ -29,7 +29,7 @@ export const handler: Handlers = {
       const block_headers = await BlockController.getBlockHeaders(block_index);
       return ResponseUtil.success({
         block_info: block_headers,
-        tx: result,
+        ...result,
       });
     } catch (error) {
       console.error("Error in block handler:", error);
