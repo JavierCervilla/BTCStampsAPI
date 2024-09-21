@@ -14,9 +14,13 @@ export const handler: Handlers<BlockHandlerContext> = {
         ? "stamps"
         : "all";
 
+      if (!block_index || isNaN(Number(block_index))) {
+        block_index = await BlockController.getLastBlock();
+      }
+
       const response = await BlockController.getBlockInfoResponse(
         block_index,
-        type,
+        type
       );
       return ResponseUtil.success(response);
     } catch (error) {
