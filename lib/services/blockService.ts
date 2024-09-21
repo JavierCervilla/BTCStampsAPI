@@ -10,7 +10,7 @@ export class BlockService {
     const [block_headers] = await Promise.all([
       BlockRepository.getBlockInfoFromDb(blockIdentifier),
     ]);
-    return block_headers;
+    return block_headers.rows[0];
   }
 
   static async getBlockInfoWithStamps(
