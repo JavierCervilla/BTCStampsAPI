@@ -27,10 +27,7 @@ export const handler: Handlers = {
       );
 
       const block_headers = await blockController.getBlockHeaders(block_index);
-      return ResponseUtil.success({
-        block_info: block_headers,
-        tx: result,
-      });
+      return ResponseUtil.success(result);
     } catch (error) {
       console.error("Error in block handler:", error);
       return ResponseUtil.handleError(error, "Error processing block request");
