@@ -9,13 +9,13 @@ export class BlockController {
 
   static async getBlockInfoWithStamps(
     blockIdentifier: number | string,
-    type: "stamps" | "cursed" | "all" = "all",
+    type: "stamps" | "cursed" | "all" = "all"
   ): Promise<StampBlockResponseBody> {
     return await BlockService.getBlockInfoWithStamps(blockIdentifier, type);
   }
 
   static transformToBlockInfoResponse(
-    stampBlockResponse: StampBlockResponseBody,
+    stampBlockResponse: StampBlockResponseBody
   ): BlockInfoResponseBody {
     return BlockService.transformToBlockInfoResponse(stampBlockResponse);
   }
@@ -47,13 +47,24 @@ export class BlockController {
     };
   }
 
+  static async getBlockHeaders(blockIdentifier: number | string) {
+    if (!isIntOr32ByteHex(blockIdentifier)) {
+      throw new Error(
+        `Invalid input: ${blockIdentifier}. It must be a valid block index (integer) or block hash (64 character string).`
+      );
+    }
+
+    const blockHeaders = await BlockService.getBlockHeaders(blockIdentifier);
+    return blockHeaders;
+  }
+
   static async getBlockInfoResponse(
     blockIdentifier: number | string,
-    type: "stamps" | "cursed" | "all" = "all",
+    type: "stamps" | "cursed" | "all" = "all"
   ) {
     if (!isIntOr32ByteHex(blockIdentifier)) {
       throw new Error(
-        `Invalid input: ${blockIdentifier}. It must be a valid block index (integer) or block hash (64 character string).`,
+        `Invalid input: ${blockIdentifier}. It must be a valid block index (integer) or block hash (64 character string).`
       );
     }
 
@@ -63,11 +74,11 @@ export class BlockController {
 
   static async getRelatedBlockInfoResponse(
     blockIdentifier: number | string,
-    type: "stamps" | "cursed",
+    type: "stamps" | "cursed"
   ) {
     if (!isIntOr32ByteHex(blockIdentifier)) {
       throw new Error(
-        "Invalid argument provided. Must be an integer or 32 byte hex string.",
+        "Invalid argument provided. Must be an integer or 32 byte hex string."
       );
     }
 
@@ -77,7 +88,7 @@ export class BlockController {
 
   static async getSharedBlockWithStamps(
     blockIndex: string | undefined,
-    type: "stamps" | "cursed",
+    type: "stamps" | "cursed"
   ) {
     let blockIdentifier: number | string;
 
@@ -86,7 +97,7 @@ export class BlockController {
       blockIdentifier = lastBlock;
     } else if (!isIntOr32ByteHex(blockIndex)) {
       throw new Error(
-        `Invalid input: ${blockIndex}. It must be a valid block index (integer) or block hash (64 character string).`,
+        `Invalid input: ${blockIndex}. It must be a valid block index (integer) or block hash (64 character string).`
       );
     } else {
       blockIdentifier = /^\d+$/.test(blockIndex)

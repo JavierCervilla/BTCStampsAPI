@@ -22,7 +22,11 @@ export const handler: Handlers<BlockHandlerContext> = {
         block_index,
         type
       );
-      return ResponseUtil.success(response);
+      const block_headers = await BlockController.getBlockHeaders(block_index);
+      return ResponseUtil.success({
+        block_info: block_headers,
+        tx: response,
+      });
     } catch (error) {
       console.error(`Error in block handler:`, error);
       return ResponseUtil.handleError(error, "Error processing block request");

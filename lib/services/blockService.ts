@@ -6,9 +6,16 @@ export class BlockService {
     return await BlockRepository.getLastXBlocksFromDb(num);
   }
 
+  static async getBlockHeaders(blockIdentifier: number | string) {
+    const [block_headers] = await Promise.all([
+      BlockRepository.getBlockInfoFromDb(blockIdentifier),
+    ]);
+    return block_headers;
+  }
+
   static async getBlockInfoWithStamps(
     blockIdentifier: number | string,
-    type: "stamps" | "cursed" | "all" = "all",
+    type: "stamps" | "cursed" | "all" = "all"
   ): Promise<StampBlockResponseBody> {
     const [block_info, last_block, data] = await Promise.all([
       BlockRepository.getBlockInfoFromDb(blockIdentifier),
@@ -34,7 +41,7 @@ export class BlockService {
   }
 
   static transformToBlockInfoResponse(
-    stampBlockResponse: StampBlockResponseBody,
+    stampBlockResponse: StampBlockResponseBody
   ): BlockInfoResponseBody {
     return {
       last_block: stampBlockResponse.last_block,
