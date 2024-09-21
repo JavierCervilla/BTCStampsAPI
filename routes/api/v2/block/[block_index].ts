@@ -17,7 +17,7 @@ export const handler: Handlers<BlockHandlerContext> = {
       if (!block_index || isNaN(Number(block_index))) {
         block_index = await BlockController.getLastBlock();
       }
-
+      console.log(block_index);
       const response = await BlockController.getBlockInfoResponse(
         block_index,
         type
