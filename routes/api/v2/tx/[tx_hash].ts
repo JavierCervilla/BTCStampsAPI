@@ -22,7 +22,7 @@ export const handler: Handlers = {
     const electrum = await electrumManager.getClient();
     try {
       const tx = await electrum.call([
-        { method: "blockchain.transaction.get", params: [txid, true] },
+        { method: "blockchain.transaction.get", params: [tx_hash, true] },
       ]);
       const src20Tx = await Src20Controller.handleSrc20TransactionsRequest(
         req,
