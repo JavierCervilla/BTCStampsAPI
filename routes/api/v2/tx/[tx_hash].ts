@@ -45,9 +45,6 @@ export const handler: Handlers = {
       return ResponseUtil.error("Internal server error", 500);
     } finally {
       electrumManager.releaseClient(electrum);
-      if (client) {
-        releaseClient(client);
-      }
     }
   },
 };
