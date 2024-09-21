@@ -34,8 +34,8 @@ export const handler: Handlers = {
         last_block: last_block,
         data: {
           tx: tx[0],
-          src20Tx: src20Tx || null,
-          stampsTx: stampsTx.data || null,
+          src20Tx: src20Tx.data || null,
+          stampsTx: stampsTx.data.stamp || null,
         },
       };
       return ResponseUtil.success(body);
