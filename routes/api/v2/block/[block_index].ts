@@ -6,7 +6,7 @@ import { BlockHandlerContext } from "globals";
 export const handler: Handlers<BlockHandlerContext> = {
   async GET(req, ctx) {
     try {
-      const { block_index } = ctx.params;
+      let { block_index } = ctx.params;
       const url = new URL(req.url);
       const type = url.pathname.includes("/cursed/")
         ? "cursed"

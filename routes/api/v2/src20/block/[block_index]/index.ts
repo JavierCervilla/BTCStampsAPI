@@ -6,7 +6,7 @@ import { ResponseUtil } from "utils/responseUtil.ts";
 export const handler: Handlers = {
   async GET(req, ctx) {
     try {
-      const { block_index } = ctx.params;
+      let { block_index } = ctx.params;
 
       if (!block_index || isNaN(Number(block_index))) {
         block_index = await BlockController.getLastBlock();
