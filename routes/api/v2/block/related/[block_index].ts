@@ -12,7 +12,7 @@ export const handler: Handlers<BlockHandlerContext> = {
     try {
       const response = await BlockController.getRelatedBlockInfoResponse(
         blockIdentifier,
-        type,
+        type
       );
       return ResponseUtil.success(response);
     } catch (error) {
@@ -20,7 +20,7 @@ export const handler: Handlers<BlockHandlerContext> = {
       return ResponseUtil.handleError(
         error,
         `Block: ${blockIdentifier} not found`,
-        404,
+        404
       );
     }
   },

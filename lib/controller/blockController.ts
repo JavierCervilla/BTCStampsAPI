@@ -81,9 +81,26 @@ export class BlockController {
         "Invalid argument provided. Must be an integer or 32 byte hex string."
       );
     }
-
+    const lastBlock = await this.getLastBlock();
     const blockInfo = await this.getBlockInfoWithStamps(blockIdentifier, type);
-    return this.transformToBlockInfoResponse(blockInfo);
+
+    const currentBlockNumber =
+      typeof blockIdentifier === "number"
+        ? blockIdentifier
+        : blockInfo.block_index;
+    let startBlock = Math.max(0, currentBlockNumber - 2);
+    let endBlock = Math.min(lastBlock.number, currentBlockNumber + 2);
+    if (currentBlockNumber === lastBlock.number) {
+      startBlock = Math.max(0, currentBlockNumber - 4);
+      endBlock = currentBlockNumber;
+    }
+    const blockPromises = [];
+    for (let i = startBlock; i <= endBlock; i++) {
+      blockPromises.push(this.getBlockInfoWithStamps(i, type));
+    }
+    const relatedBlocks = await Promise.all(blockPromises);
+
+    return this.transformToBlockInfoResponse(relatedBlocks);
   }
 
   static async getSharedBlockWithStamps(
