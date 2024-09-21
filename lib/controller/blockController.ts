@@ -96,7 +96,7 @@ export class BlockController {
     }
     const blockPromises = [];
     for (let i = startBlock; i <= endBlock; i++) {
-      blockPromises.push(this.getBlockInfoWithStamps(i, type));
+      blockPromises.push(this.getBlockHeaders(i));
     }
     const relatedBlocks = await Promise.all(blockPromises);
 
