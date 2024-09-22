@@ -21,6 +21,7 @@ export const handler: Handlers<AddressTickHandlerContext> = {
 			};
 
 			const result = await Src20Controller.getValidSrc20Tx(balanceParams);
+			console.log(result);
 
 			if (!result || Object.keys(result).length === 0) {
 				console.log("Empty result received:", result);
