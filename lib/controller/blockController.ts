@@ -31,16 +31,17 @@ export class BlockController {
 
 	static async getBlockPageData(blockIdentifier: number | string) {
 		if (!blockIdentifier || isNaN(Number(blockIdentifier))) {
-			const lastBlock = await this.getLastBlock();
+			const lastBlock = await BlockController.getLastBlock();
 			blockIdentifier = lastBlock;
 		}
 
 		const [stampBlockResponse, related_blocks] = await Promise.all([
-			this.getBlockInfoWithStamps(blockIdentifier, "stamps"),
-			this.getRelatedBlocksWithStamps(blockIdentifier),
+			BlockController.getBlockInfoWithStamps(blockIdentifier, "stamps"),
+			BlockController.getRelatedBlocksWithStamps(blockIdentifier),
 		]);
 
-		const block = this.transformToBlockInfoResponse(stampBlockResponse);
+		const block =
+			BlockController.transformToBlockInfoResponse(stampBlockResponse);
 
 		return {
 			block,
@@ -69,8 +70,11 @@ export class BlockController {
 			);
 		}
 
-		const blockInfo = await this.getBlockInfoWithStamps(blockIdentifier, type);
-		return this.transformToBlockInfoResponse(blockInfo);
+		const blockInfo = await BlockController.getBlockInfoWithStamps(
+			blockIdentifier,
+			type,
+		);
+		return BlockController.transformToBlockInfoResponse(blockInfo);
 	}
 
 	static async getRelatedBlockInfoResponse(
@@ -85,8 +89,6 @@ export class BlockController {
 		const lastBlock = await BlockController.getLastBlock();
 		const blockInfo = await BlockController.getBlockHeaders(blockIdentifier);
 
-		console.log({ blockInfo });
-
 		const currentBlockNumber =
 			typeof blockIdentifier === "number"
 				? blockIdentifier
@@ -98,15 +100,12 @@ export class BlockController {
 			startBlock = Math.max(0, currentBlockNumber - 4);
 			endBlock = currentBlockNumber;
 		}
-		console.log({ startBlock, endBlock });
 		const blockPromises = [];
 		for (let i = startBlock; i <= endBlock; i++) {
 			blockPromises.push(BlockController.getBlockHeaders(i));
 		}
-		console.log({ blockPromises });
 		const relatedBlocks = await Promise.all(blockPromises);
 
-		console.log({ relatedBlocks });
 		return relatedBlocks;
 	}
 
@@ -117,7 +116,7 @@ export class BlockController {
 		let blockIdentifier: number | string;
 
 		if (!blockIndex) {
-			const lastBlock = await this.getLastBlock();
+			const lastBlock = await BlockController.getLastBlock();
 			blockIdentifier = lastBlock;
 		} else if (!isIntOr32ByteHex(blockIndex)) {
 			throw new Error(
@@ -129,6 +128,6 @@ export class BlockController {
 				: blockIndex;
 		}
 
-		return await this.getBlockInfoWithStamps(blockIdentifier, type);
+		return await BlockController.getBlockInfoWithStamps(blockIdentifier, type);
 	}
 }
