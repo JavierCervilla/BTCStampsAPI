@@ -2,6 +2,7 @@ import { BlockService } from "$lib/services/blockService.ts";
 import { BlockInfoResponseBody, StampBlockResponseBody } from "globals";
 import { isIntOr32ByteHex } from "utils/util.ts";
 
+// biome-ignore lint/complexity/noStaticOnlyClass: Better organization this way.
 export class BlockController {
 	static async getLastXBlocks(num: number) {
 		return await BlockService.getLastXBlocks(num);
@@ -81,8 +82,11 @@ export class BlockController {
 				"Invalid argument provided. Must be an integer or 32 byte hex string.",
 			);
 		}
-		const lastBlock = await this.getLastBlock();
-		const blockInfo = await this.getBlockInfoWithStamps(blockIdentifier, type);
+		const lastBlock = await BlockController.getLastBlock();
+		const blockInfo = await BlockController.getBlockInfoWithStamps(
+			blockIdentifier,
+			type,
+		);
 
 		const currentBlockNumber =
 			typeof blockIdentifier === "number"
@@ -96,8 +100,9 @@ export class BlockController {
 		}
 		const blockPromises = [];
 		for (let i = startBlock; i <= endBlock; i++) {
-			blockPromises.push(this.getBlockHeaders(i));
+			blockPromises.push(BlockController.getBlockHeaders(i));
 		}
+		console.log({ blockPromises });
 		const relatedBlocks = await Promise.all(blockPromises);
 
 		console.log({ relatedBlocks });
