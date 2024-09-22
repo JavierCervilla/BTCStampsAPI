@@ -26,7 +26,6 @@ export const handler: Handlers = {
 				{ method: "blockchain.transaction.get", params: [tx_hash, true] },
 			]);
 			const last_block = await BlockController.getLastBlock();
-			console.log({ last_block });
 			const src20Tx = await Src20Controller.handleSrc20TransactionsRequest(
 				req,
 				params,
@@ -43,7 +42,7 @@ export const handler: Handlers = {
 				data: {
 					tx: tx[0],
 					src20Tx: src20Tx.data || null,
-					stampsTx: stampsTx.data.stamp || null,
+					stampsTx: stampsTx?.data?.stamp || null,
 				},
 			};
 			return ResponseUtil.success(body);
