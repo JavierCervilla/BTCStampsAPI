@@ -27,7 +27,15 @@ export const handler: Handlers<AddressTickHandlerContext> = {
 				return ResponseUtil.error("No data found", 404);
 			}
 
-			return ResponseUtil.success(result.rows);
+			const total_tx_result =
+				await Src20Controller.getTotalCountValidSrc20Tx(queryParams);
+
+			console.log(total_tx_result);
+
+			return ResponseUtil.success({
+				data: result.rows,
+				total: total_tx_result,
+			});
 		} catch (error) {
 			console.error("Error in GET handler:", error);
 			return ResponseUtil.handleError(
