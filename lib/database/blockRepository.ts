@@ -184,6 +184,7 @@ export class BlockRepository {
 			[queryValue],
 			"never",
 		);
+		console.log({ result }, result as number[][0]);
 		return (result as number[])[0];
 	}
 
@@ -202,6 +203,7 @@ export class BlockRepository {
 			[queryValue],
 			"never",
 		);
+		console.log({ result }, result as number[][0]);
 		return (result as number[])[0];
 	}
 }
