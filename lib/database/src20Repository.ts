@@ -67,7 +67,6 @@ export class SRC20Repository {
 			sqlQuery += ` WHERE ` + whereConditions.join(" AND ");
 		}
 
-		console.log({ sqlQuery });
 		return await dbManager.executeQueryWithCache(
 			sqlQuery,
 			queryParams,
