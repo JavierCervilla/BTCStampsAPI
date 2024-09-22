@@ -25,7 +25,8 @@ export const handler: Handlers = {
 			const tx = await electrum.call([
 				{ method: "blockchain.transaction.get", params: [tx_hash, true] },
 			]);
-			const last_block = BlockController.getLastBlock();
+			const last_block = await BlockController.getLastBlock();
+			console.log({ last_block });
 			const src20Tx = await Src20Controller.handleSrc20TransactionsRequest(
 				req,
 				params,
