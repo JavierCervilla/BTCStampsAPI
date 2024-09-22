@@ -94,8 +94,8 @@ export class BlockController {
 				? blockIdentifier
 				: blockInfo.block_index;
 		let startBlock = Math.max(0, currentBlockNumber - 2);
-		let endBlock = Math.min(lastBlock.number, currentBlockNumber + 2);
-		if (currentBlockNumber === lastBlock.number) {
+		let endBlock = Math.min(lastBlock, currentBlockNumber + 2);
+		if (currentBlockNumber === lastBlock) {
 			startBlock = Math.max(0, currentBlockNumber - 4);
 			endBlock = currentBlockNumber;
 		}
