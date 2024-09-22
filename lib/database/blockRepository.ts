@@ -184,8 +184,7 @@ export class BlockRepository {
 			[queryValue],
 			"never",
 		);
-		console.log({ result }, result as number[][0]);
-		return (result as number[])[0];
+		return result.rowws[0]["stamps"] as number;
 	}
 
 	static async countSRC20inBlock(block_index: number) {
@@ -203,7 +202,6 @@ export class BlockRepository {
 			[queryValue],
 			"never",
 		);
-		console.log({ result }, result as number[][0]);
-		return (result as number[])[0];
+		return result.rows[0]["src20"] as number;
 	}
 }
