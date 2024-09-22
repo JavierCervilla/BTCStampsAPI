@@ -184,7 +184,7 @@ export class BlockRepository {
 			[queryValue],
 			"never",
 		);
-		return result.rowws[0]["stamps"] as number;
+		return result.rows[0]["stamps"] as number;
 	}
 
 	static async countSRC20inBlock(block_index: number) {
