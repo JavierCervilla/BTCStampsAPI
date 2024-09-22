@@ -9,6 +9,7 @@ import {
 } from "globals";
 import { dbManager } from "$server/database/db.ts";
 
+// biome-ignore lint/complexity/noStaticOnlyClass: Better organization this way.
 export class SRC20Repository {
 	static async getTotalCountValidSrc20TxFromDb(params: SRC20TrxRequestParams) {
 		const {
@@ -48,8 +49,8 @@ export class SRC20Repository {
 		}
 
 		if (address !== null) {
-			whereConditions.push(`address = ?`);
-			queryParams.push(address);
+			whereConditions.push(`(creator = ? OR destination = ?)`);
+			queryParams.push(address, address);
 		}
 
 		if (tx_hash !== null) {
