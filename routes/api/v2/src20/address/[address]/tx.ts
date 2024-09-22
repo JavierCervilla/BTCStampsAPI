@@ -11,7 +11,7 @@ export const handler: Handlers<AddressTickHandlerContext> = {
 			const url = new URL(req.url);
 			const params = url.searchParams;
 
-			const balanceParams = {
+			const queryParams = {
 				address,
 				includePagination: params.get("includePagination") === "true", // or however you determine this
 				limit: Number(params.get("limit")) || undefined,
@@ -20,15 +20,14 @@ export const handler: Handlers<AddressTickHandlerContext> = {
 				sort: params.get("sort") || undefined,
 			};
 
-			const result = await Src20Controller.getValidSrc20Tx(balanceParams);
-			console.log(result);
+			const result = await Src20Controller.getValidSrc20Tx(queryParams);
 
 			if (!result || Object.keys(result).length === 0) {
 				console.log("Empty result received:", result);
 				return ResponseUtil.error("No data found", 404);
 			}
 
-			return ResponseUtil.success(result);
+			return ResponseUtil.success(result.rows);
 		} catch (error) {
 			console.error("Error in GET handler:", error);
 			return ResponseUtil.handleError(
