@@ -83,10 +83,9 @@ export class BlockController {
 			);
 		}
 		const lastBlock = await BlockController.getLastBlock();
-		const blockInfo = await BlockController.getBlockInfoWithStamps(
-			blockIdentifier,
-			type,
-		);
+		const blockInfo = await BlockController.getBlockHeaders(blockIdentifier);
+
+		console.log({ blockInfo });
 
 		const currentBlockNumber =
 			typeof blockIdentifier === "number"
@@ -108,7 +107,7 @@ export class BlockController {
 		const relatedBlocks = await Promise.all(blockPromises);
 
 		console.log({ relatedBlocks });
-		return this.transformToBlockInfoResponse(relatedBlocks);
+		return relatedBlocks;
 	}
 
 	static async getSharedBlockWithStamps(
