@@ -30,8 +30,6 @@ export const handler: Handlers<AddressTickHandlerContext> = {
 			const total_tx_result =
 				await Src20Controller.getTotalCountValidSrc20Tx(queryParams);
 
-			console.log(total_tx_result);
-
 			return ResponseUtil.success({
 				data: result.rows,
 				total: total_tx_result,
