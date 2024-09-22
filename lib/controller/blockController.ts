@@ -83,7 +83,6 @@ export class BlockController {
 			);
 		}
 		const lastBlock = await BlockController.getLastBlock();
-		console.log({ lastBlock });
 		const blockInfo = await BlockController.getBlockInfoWithStamps(
 			blockIdentifier,
 			type,
@@ -93,6 +92,7 @@ export class BlockController {
 			typeof blockIdentifier === "number"
 				? blockIdentifier
 				: blockInfo.block_index;
+		console.log({ currentBlockNumber });
 		let startBlock = Math.max(0, currentBlockNumber - 2);
 		let endBlock = Math.min(lastBlock, currentBlockNumber + 2);
 		if (currentBlockNumber === lastBlock) {
