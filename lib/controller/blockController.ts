@@ -83,6 +83,7 @@ export class BlockController {
 			);
 		}
 		const lastBlock = await BlockController.getLastBlock();
+		console.log({ lastBlock });
 		const blockInfo = await BlockController.getBlockInfoWithStamps(
 			blockIdentifier,
 			type,
@@ -98,6 +99,7 @@ export class BlockController {
 			startBlock = Math.max(0, currentBlockNumber - 4);
 			endBlock = currentBlockNumber;
 		}
+		console.log({ startBlock, endBlock });
 		const blockPromises = [];
 		for (let i = startBlock; i <= endBlock; i++) {
 			blockPromises.push(BlockController.getBlockHeaders(i));
