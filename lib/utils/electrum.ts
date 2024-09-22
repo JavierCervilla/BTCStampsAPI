@@ -3,8 +3,12 @@ import { serverConfig } from "$server/config/config.ts";
 import { BufReader } from "https://deno.land/std@0.177.0/io/mod.ts";
 import { TextProtoReader } from "https://deno.land/std@0.52.0/textproto/mod.ts";
 
+interface ElectrumResult {
+  result: unknown;
+}
+
 export class Electrum {
-  private conn: Deno.Conn;
+  private conn: Deno.Conn | null;
   private reader: TextProtoReader;
   private id: number;
   public uuid: string;
@@ -37,20 +41,41 @@ export class Electrum {
     }));
   }
 
+  private async reconnect(): Promise<void> {
+    let retries = 3;
+    while (retries > 0) {
+      try {
+        await this.connect({ hostname: serverConfig.ELECTRUM.HOST, port: serverConfig.ELECTRUM.PORT });
+        console.log(`Successfully reconnected ${this.uuid}`);
+        return;
+      } catch (error) {
+        console.error(`Reconnection attempt failed for ${this.uuid}:`, error);
+        retries--;
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retrying
+      }
+    }
+    throw new Error(`Failed to reconnect ${this.uuid} after 3 attempts`);
+  }
+
   public async call(
-    requests: { method: string; params: any[] }[],
-  ): Promise<any[]> {
+    requests: { method: string; params: unknown[] }[],
+  ): Promise<unknown[]> {
+    if (!this.conn) {
+      console.warn(`Connection ${this.uuid} is not established. Attempting to reconnect...`);
+      await this.reconnect();
+    }
     const rpcRequests = this.createRequests(requests);
-
-    const msg = JSON.stringify(rpcRequests) + "\n";
-    await this.conn.write(new TextEncoder().encode(msg));
-
-    const responseLine = await this.readLine();
-    const response = JSON.parse(responseLine);
     try {
-      return response.map((r: any) => r.result);
+      const msg = `${JSON.stringify(rpcRequests)}\n`;
+      await this.conn.write(new TextEncoder().encode(msg));
+  
+      const responseLine = await this.readLine();
+      const response = JSON.parse(responseLine);
+      return response.map((r: ElectrumResult) => r.result);
     } catch (err) {
-      throw new Error(JSON.stringify(response));
+      console.error(`Error in Electrum call for ${this.uuid}:`, err);
+      this.close();
+      throw new Error(`Electrum call failed: ${err.message}`);
     }
   }
 
