@@ -10,6 +10,7 @@ import { serverConfig } from "$server/config/config.ts";
 import type { IPrepareSRC20TX, PSBTInput, VOUT } from "$lib/types/src20.d.ts";
 import { getTransaction } from "../../quicknode.ts";
 import { getUTXOForAddress } from "utils/minting/src20/utils.ts";
+import * as msgpack from "https://deno.land/x/msgpack@v1.4/mod.ts";
 
 const RECIPIENT_DUST = 789;
 const MULTISIG_DUST = 809;
