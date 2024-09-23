@@ -1,10 +1,11 @@
 import { Handlers } from "$fresh/server.ts";
 import { convertEmojiToTick, convertToEmoji, paginate } from "utils/util.ts";
 import { BigFloat } from "bigfloat/mod.ts";
-import { PaginatedTickResponseBody, TickHandlerContext } from "globals";
+import { PaginatedTickResponseBody } from "globals";
 import { ResponseUtil } from "utils/responseUtil.ts";
 import { Src20Controller } from "$lib/controller/src20Controller.ts";
 import { getPaginationParams } from "$lib/utils/paginationUtils.ts";
+import { BlockService } from "$lib/services/blockService.ts";
 
 export const handler: Handlers = {
   async GET(req, ctx) {
@@ -21,9 +22,12 @@ export const handler: Handlers = {
         sort: url.searchParams.get("sort") || "ASC",
       };
 
-      const { src20_txs, total, lastBlock } = await Src20Controller
+      const src20_txs = await Src20Controller
         .getValidSrc20Tx(params);
+      const total = await Src20Controller.getTotalCountValidSrc20Tx(params);
 
+      const lastBlock = await BlockService.getLastBlock();
+      console.log(src20_txs);
       const pagination = paginate(total, params.page, params.limit);
 
       const body: PaginatedTickResponseBody = {
