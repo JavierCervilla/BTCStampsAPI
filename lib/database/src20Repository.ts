@@ -155,6 +155,8 @@ export class SRC20Repository {
         src20.max,
         src20.destination,
         src20.block_time,
+				src20.creator_bal,
+				src20.destination_bal,
         creator_info.creator as creator_name,
         destination_info.creator as destination_name
       FROM
