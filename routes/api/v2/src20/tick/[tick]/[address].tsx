@@ -17,7 +17,8 @@ export const handler: Handlers = {
         page,
         sort: url.searchParams.get("sort") || "ASC",
       };
-      const result = await Src20Controller.handleSrc20BalanceRequest(params);
+      const result = await Src20Controller.getValidSrc20Tx(params);
+      console.log(result);
       return ResponseUtil.success(result);
     } catch (error) {
       console.error(error);
