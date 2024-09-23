@@ -21,7 +21,8 @@ export const handler: Handlers = {
         sort: url.searchParams.get("sort") || "ASC",
       };
 
-      const src20_txs = await Src20Controller.getValidSrc20Tx(params);
+      const { src20_txs, total, lastBlock } = await Src20Controller
+        .getValidSrc20Tx(params);
 
       const pagination = paginate(total, params.page, params.limit);
 
