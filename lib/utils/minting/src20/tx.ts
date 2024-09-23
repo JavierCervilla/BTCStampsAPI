@@ -4,7 +4,7 @@ import * as ecc from "tiny-secp256k1";
 import * as crypto from "crypto";
 import { Buffer } from "buffer";
 import { selectUTXOs } from "./utxo-selector.ts";
-import { bin2hex, hex2bin } from "../utils.ts";
+import { bin2hex, hex2bin, arc4 } from "../utils.ts";
 import { compressWithCheck } from "../zlib.ts";
 import { serverConfig } from "$server/config/config.ts";
 import type { IPrepareSRC20TX, PSBTInput, VOUT } from "$lib/types/src20.d.ts";
