@@ -8,7 +8,9 @@
     "docs": "deno run --allow-read --allow-write swagger.js",
     "fakebuild": "echo 'fake build'",
     "preview": "deno run -A main.ts",
-    "update": "deno run -A -r https://fresh.deno.dev/update ."
+    "update": "deno run -A -r https://fresh.deno.dev/update .",
+    "decode:msig": "deno run -A scripts/decodeSRC20Msig.ts",
+    "decode:olga": "deno run -A scripts/decodeSRC20Olga.ts"
   },
   "lint": { "rules": { "tags": ["fresh", "recommended"] } },
   "exclude": ["**/_fresh/*", "**/server/**/*"],
@@ -50,7 +52,8 @@
     "$/": "./",
     "$server/": "./server/",
     "bitcoinjs-lib": "npm:bitcoinjs-lib@6.1.6",
-    "tiny-secp256k1": "npm:tiny-secp256k1@2.2.3"
+    "tiny-secp256k1": "npm:tiny-secp256k1@2.2.3",
+    "msgpack": "https://deno.land/x/msgpack@v1.4/mod.ts"
   },
   "compilerOptions": {
     "jsx": "react-jsx",

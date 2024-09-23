@@ -464,6 +464,8 @@ export interface InputData {
   fromAddress?: string;
   tick: string;
   feeRate: number;
+  fee: number;
+  recipientFee: string;
   max?: number | string;
   lim?: number | string;
   dec?: number;

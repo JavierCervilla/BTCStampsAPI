@@ -36,6 +36,8 @@ export interface IPrepareSRC20TX {
   feeRate: number;
   transferString: string;
   enableRBF?: boolean;
+  fee?: number;
+  recipientFee?: string;
 }
 
 export interface IMintSRC20 extends Omit<IPrepareSRC20TX, "transferString"> {

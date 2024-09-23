@@ -20,6 +20,8 @@ export async function handleSRC20Operation(
     changeAddress: body.changeAddress,
     toAddress: body.toAddress,
     feeRate: body.feeRate,
+    fee: body.fee ? body.fee : null,
+    recipientFee: body.recipientFee ? body.recipientFee : null,
   };
 
   switch (operation) {

@@ -1,82 +1,76 @@
 import * as btc from "bitcoin";
-import { Output } from "utils/minting/src20/utils.d.ts";
+import type { Output } from "utils/minting/src20/utils.d.ts";
 
-export function scramble(key, str) {
-  const s = [];
-  let j = 0,
-    i = 0,
-    x,
-    res = "";
-  for (let i = 0; i < 256; i++) {
-    s[i] = i;
-  }
-  for (i = 0; i < 256; i++) {
-    j = (j + s[i] + key.charCodeAt(i % key.length)) % 256;
-    x = s[i];
-    s[i] = s[j];
-    s[j] = x;
-  }
-  i = 0;
-  j = 0;
-  for (let y = 0; y < str.length; y++) {
-    i = (i + 1) % 256;
-    j = (j + s[i]) % 256;
-    x = s[i];
-    s[i] = s[j];
-    s[j] = x;
-    res += String.fromCharCode(str.charCodeAt(y) ^ s[(s[i] + s[j]) % 256]);
-  }
-  return res;
+export function arc4(key: Uint8Array, data: Uint8Array): Uint8Array {
+	const S = new Uint8Array(256);
+
+	// Key-scheduling algorithm (KSA)
+	for (let i = 0; i < 256; i++) {
+		S[i] = i;
+	}
+
+	let j = 0;
+	for (let i = 0; i < 256; i++) {
+		j = (j + S[i] + key[i % key.length]) & 0xff;
+		[S[i], S[j]] = [S[j], S[i]];
+	}
+
+	// Pseudo-random generation algorithm (PRGA)
+	const result = new Uint8Array(data.length);
+	let i = 0;
+	j = 0;
+	for (let n = 0; n < data.length; n++) {
+		i = (i + 1) & 0xff;
+		j = (j + S[i]) & 0xff;
+		[S[i], S[j]] = [S[j], S[i]];
+		const K = S[(S[i] + S[j]) & 0xff];
+		result[n] = data[n] ^ K;
+	}
+
+	return result;
 }
 
-export function hex2bin(hex) {
-  var bytes = [];
-  var str;
-  for (var i = 0; i < hex.length - 1; i += 2) {
-    var ch = parseInt(hex.substr(i, 2), 16);
-    bytes.push(ch);
-  }
-  str = String.fromCharCode.apply(String, bytes);
-  return str;
+export function hex2bin(hexString: string): Uint8Array {
+	const normalizedHex = hexString.replace(/\s/g, "");
+	const bytes = new Uint8Array(
+		normalizedHex.match(/.{1,2}/g)?.map((byte) => Number.parseInt(byte, 16)) ??
+			[],
+	);
+	return bytes;
 }
 
-export function bin2hex(s) {
-  // http://kevin.vanzonneveld.net
-  var i, l, o = "", n;
-  s += "";
-  for (i = 0, l = s.length; i < l; i++) {
-    n = s.charCodeAt(i).toString(16);
-    o += n.length < 2 ? "0" + n : n;
-  }
-  return o;
+export function bin2hex(data: Uint8Array): string {
+	return Array.from(data)
+		.map((b) => b.toString(16).padStart(2, "0"))
+		.join("");
 }
 
 export function extractOutputs(tx: btc.Transaction, address: string) {
-  const outputs = [];
-  for (const vout of tx.outs) {
-    if ("address" in vout) {
-      outputs.push({
-        value: vout.value,
-        address: vout.address,
-      });
-    } else if ("script" in vout) {
-      try {
-        if (
-          btc.address.fromOutputScript(vout.script, btc.networks.bitcoin) !==
-            address
-        ) {
-          outputs.push({
-            value: vout.value,
-            script: vout.script,
-          });
-        }
-      } catch {
-        outputs.push({
-          value: vout.value,
-          script: vout.script,
-        });
-      }
-    }
-  }
-  return outputs as Output[];
+	const outputs = [];
+	for (const vout of tx.outs) {
+		if ("address" in vout) {
+			outputs.push({
+				value: vout.value,
+				address: vout.address,
+			});
+		} else if ("script" in vout) {
+			try {
+				if (
+					btc.address.fromOutputScript(vout.script, btc.networks.bitcoin) !==
+					address
+				) {
+					outputs.push({
+						value: vout.value,
+						script: vout.script,
+					});
+				}
+			} catch {
+				outputs.push({
+					value: vout.value,
+					script: vout.script,
+				});
+			}
+		}
+	}
+	return outputs as Output[];
 }

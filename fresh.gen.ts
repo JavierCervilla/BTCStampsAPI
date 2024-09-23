@@ -20,6 +20,7 @@ import * as $api_v2_cursed_block from "./routes/api/v2/cursed/block.ts";
 import * as $api_v2_cursed_block_block_index_ from "./routes/api/v2/cursed/block/[block_index].ts";
 import * as $api_v2_cursed_index from "./routes/api/v2/cursed/index.ts";
 import * as $api_v2_docs from "./routes/api/v2/docs.ts";
+import * as $api_v2_electrum_index from "./routes/api/v2/electrum/index.ts";
 import * as $api_v2_health from "./routes/api/v2/health.ts";
 import * as $api_v2_olga_mint from "./routes/api/v2/olga/mint.ts";
 import * as $api_v2_src20_op_ from "./routes/api/v2/src20/[...op].ts";
@@ -42,6 +43,7 @@ import * as $api_v2_stamps_dispensers_id_ from "./routes/api/v2/stamps/dispenser
 import * as $api_v2_stamps_dispensers_index from "./routes/api/v2/stamps/dispensers/index.ts";
 import * as $api_v2_stamps_ident_ident_ from "./routes/api/v2/stamps/ident/[ident].ts";
 import * as $api_v2_stamps_index from "./routes/api/v2/stamps/index.ts";
+import * as $api_v2_tx_tx_hash_ from "./routes/api/v2/tx/[tx_hash].ts";
 import * as $api_v2_version from "./routes/api/v2/version.ts";
 import * as $config from "./routes/config.ts";
 import * as $content_imgpath_ from "./routes/content/[...imgpath].tsx";
@@ -79,6 +81,7 @@ const manifest = {
       $api_v2_cursed_block_block_index_,
     "./routes/api/v2/cursed/index.ts": $api_v2_cursed_index,
     "./routes/api/v2/docs.ts": $api_v2_docs,
+    "./routes/api/v2/electrum/index.ts": $api_v2_electrum_index,
     "./routes/api/v2/health.ts": $api_v2_health,
     "./routes/api/v2/olga/mint.ts": $api_v2_olga_mint,
     "./routes/api/v2/src20/[...op].ts": $api_v2_src20_op_,
@@ -110,6 +113,7 @@ const manifest = {
       $api_v2_stamps_dispensers_index,
     "./routes/api/v2/stamps/ident/[ident].ts": $api_v2_stamps_ident_ident_,
     "./routes/api/v2/stamps/index.ts": $api_v2_stamps_index,
+    "./routes/api/v2/tx/[tx_hash].ts": $api_v2_tx_tx_hash_,
     "./routes/api/v2/version.ts": $api_v2_version,
     "./routes/config.ts": $config,
     "./routes/content/[...imgpath].tsx": $content_imgpath_,
