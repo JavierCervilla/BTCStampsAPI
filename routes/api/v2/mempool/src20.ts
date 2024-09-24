@@ -28,7 +28,7 @@ export const handler: Handlers = {
 
 			return new Response(
 				JSON.stringify({
-					total: src20Txs.total,
+					total: filteredTxs.length,
 					processed: src20Txs.processed,
 					mempool_size: src20Txs.mempool_size,
 					data: filteredTxs,
