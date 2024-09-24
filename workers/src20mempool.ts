@@ -9,7 +9,6 @@ import {
 
 const BATCH_SIZE = 1000;
 const CACHE_TTL = 30 * 60 * 1000;
-const CONFIRMATION_CHECK_INTERVAL = 5 * 60 * 1000;
 
 interface CachedSRC20Transaction extends SRC20Transaction {
 	timestamp: number;
@@ -31,6 +30,7 @@ async function processBatch(
 	currentTime: number,
 ) {
 	const newCachedSrc20Txs: CachedSRC20Transaction[] = [];
+	const startTime = Date.now();
 	let analized = 0;
 
 	const batch = mempoolTxs.slice(startIndex, startIndex + BATCH_SIZE);
@@ -71,9 +71,11 @@ async function processBatch(
 	}
 	cache.cachedSrc20Txs = Array.from(txMap.values());
 
+	const endTime = Date.now();
+	const timeTaken = endTime - startTime / 1000;
 	cache.mempoolTxsAnalized += analized;
 	console.log(
-		`Processed batch. Updated SRC20 transactions cache. Found ${cache.cachedSrc20Txs.length} transactions.`,
+		`Processed batch in ${timeTaken}s. Updated SRC20 transactions cache. Found ${newCachedSrc20Txs.length} new transactions.`,
 	);
 }
 
