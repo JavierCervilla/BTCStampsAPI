@@ -91,9 +91,14 @@ export async function decodeSRC20Transaction(
 			txDetails.vin.reduce((acc: number, input: { value: number }) => {
 				return acc + (Number(input.value) || 0);
 			}, 0) -
-			txDetails.vout.reduce((acc: number, output: { value: number }) => {
-				return acc + (Number(output.value) || 0);
-			}, 0) *
+			txDetails.vout
+				.filter(
+					(output: { scriptPubKey: { addresses: string[] } }) =>
+						!output.scriptPubKey.addresses.includes(creator), // Excluir dirección de cambio
+				)
+				.reduce((acc: number, output: { value: number }) => {
+					return acc + (Number(output.value) || 0);
+				}, 0) *
 				-1;
 		const transactionSize =
 			txDetails.size ||
