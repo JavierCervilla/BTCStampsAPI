@@ -164,10 +164,6 @@ const TWO_MINUTES = 2 * 60 * 1000;
 // Ejecutamos el escaneo inicial inmediatamente
 scanMempool();
 
-// Configuramos los intervalos
-setInterval(scanMempool, ONE_MINUTE);
-setInterval(checkConfirmations, FIVE_MINUTES);
-
 // Export the interval IDs if you need to clear them later
 export const scanIntervalId = setInterval(scanMempool, FIVE_MINUTES);
 export const checkIntervalId = setInterval(checkConfirmations, FIVE_MINUTES);
