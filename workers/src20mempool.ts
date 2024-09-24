@@ -7,7 +7,7 @@ import {
 	isTransactionConfirmed,
 } from "$lib/utils/btc.ts";
 
-const BATCH_SIZE = 2500;
+const BATCH_SIZE = 500;
 const CACHE_TTL = 30 * 60 * 1000;
 const CONFIRMATION_CHECK_INTERVAL = 5 * 60 * 1000;
 
