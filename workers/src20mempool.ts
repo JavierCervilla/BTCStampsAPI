@@ -22,6 +22,46 @@ const cache = {
 	mempoolTxsAnalized: 0 as number,
 };
 
+async function processBatch(
+	mempoolTxs: string[],
+	startIndex: number,
+	currentTime: number,
+) {
+	const newCachedSrc20Txs: CachedSRC20Transaction[] = [];
+	let analized = 0;
+
+	const batch = mempoolTxs.slice(startIndex, startIndex + BATCH_SIZE);
+	for (const txid of batch) {
+		if (cache.cachedSrc20Txs.some((tx) => tx.tx_hash === txid)) {
+			continue;
+		}
+		analized++;
+		try {
+			const decodedTx = await decodeSRC20Transaction(txid);
+			if (decodedTx) {
+				newCachedSrc20Txs.push({
+					...decodedTx,
+					timestamp: currentTime,
+				});
+			}
+		} catch (error) {
+			console.error(`Error decoding transaction ${txid}:`, error);
+		}
+	}
+
+	// Mantener transacciones existentes que aún son válidas
+	const validExistingTxs = cache.cachedSrc20Txs.filter(
+		(tx) =>
+			currentTime - tx.timestamp < CACHE_TTL && mempoolTxs.includes(tx.tx_hash),
+	);
+
+	cache.cachedSrc20Txs = [...validExistingTxs, ...newCachedSrc20Txs];
+	cache.mempoolTxsAnalized += analized;
+	console.log(
+		`Processed batch. Updated SRC20 transactions cache. Found ${cache.cachedSrc20Txs.length} transactions.`,
+	);
+}
+
 async function scanMempool() {
 	try {
 		const mempoolTxs = await getMempoolTransactions();
@@ -29,40 +69,14 @@ async function scanMempool() {
 		const currentTime = Date.now();
 		cache.totalMempoolTxs = mempoolTxs.length;
 		cache.lastCacheTime = currentTime;
-		const newCachedSrc20Txs: CachedSRC20Transaction[] = [];
 		let analized = 0;
-		// Procesar nuevas transacciones
-		for (let i = 0; i < Math.min(mempoolTxs.length, BATCH_SIZE); i++) {
-			const txid = mempoolTxs[i];
-			if (cache.cachedSrc20Txs.filter((tx) => tx.tx_hash === txid).length > 0) {
-				continue;
-			}
-			analized++;
-			try {
-				const decodedTx = await decodeSRC20Transaction(txid);
-				if (decodedTx) {
-					newCachedSrc20Txs.push({
-						...decodedTx,
-						timestamp: currentTime,
-					});
-				}
-			} catch (error) {
-				console.error(`Error decoding transaction ${txid}:`, error);
-			}
+
+		let startIndex = 0;
+		while (startIndex < mempoolTxs.length) {
+			await processBatch(mempoolTxs, startIndex, currentTime);
+			startIndex += BATCH_SIZE;
+			analized += BATCH_SIZE;
 		}
-
-		// Mantener transacciones existentes que aún son válidas
-		const validExistingTxs = cache.cachedSrc20Txs.filter(
-			(tx) =>
-				currentTime - tx.timestamp < CACHE_TTL &&
-				mempoolTxs.includes(tx.tx_hash),
-		);
-
-		cache.cachedSrc20Txs = [...validExistingTxs, ...newCachedSrc20Txs];
-		cache.mempoolTxsAnalized = analized;
-		console.log(
-			`Updated SRC20 transactions cache. Found ${cache.cachedSrc20Txs.length} transactions.`,
-		);
 	} catch (error) {
 		console.error("Error scanning mempool:", error);
 	}
