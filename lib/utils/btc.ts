@@ -197,3 +197,10 @@ export async function getBitcoinNodeInfo(): Promise<any> {
 		throw error;
 	}
 }
+
+export async function getTransaction(txHash: string): Promise<T> {
+	const method = "getrawtransaction";
+	const params = [txHash, true];
+	const response = await bitcoinRPC<T>(method, params);
+	return response.result;
+}
