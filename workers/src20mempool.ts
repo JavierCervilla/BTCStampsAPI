@@ -27,7 +27,7 @@ async function scanMempool() {
 		const mempoolTxs = await getMempoolTransactions();
 		console.log(`Found ${mempoolTxs.length} transactions in mempool.`);
 		const currentTime = Date.now();
-		cache.totalMempoolTxs += mempoolTxs.length;
+		cache.totalMempoolTxs = mempoolTxs.length;
 		cache.lastCacheTime = currentTime;
 		const newCachedSrc20Txs: CachedSRC20Transaction[] = [];
 		let analized = 0;
@@ -94,11 +94,20 @@ async function checkConfirmations() {
 	}
 }
 
-export function getCachedSrc20Txs(): CachedSRC20Transaction[] {
+interface MempoolInfo {
+	mempool_size: number;
+	analized: number;
+	lastCacheTime: string;
+	total: number;
+	mempool: SRC20Transaction[];
+}
+
+export function getCachedSrc20Txs(): MempoolInfo {
 	return {
-		total: cache.totalMempoolTxs,
+		mempool_size: cache.totalMempoolTxs,
 		analized: cache.mempoolTxsAnalized,
-		lastCacheTime: cache.lastCacheTime,
+		lastCacheTime: cache.lastCacheTime.toLocaleString(),
+		total: cache.cachedSrc20Txs.length,
 		mempool: cache.cachedSrc20Txs.map(({ timestamp, ...tx }) => tx),
 	};
 }
@@ -112,7 +121,7 @@ const TWO_MINUTES = 2 * 60 * 1000;
 scanMempool();
 
 // Configuramos los intervalos
-setInterval(scanMempool, TWO_MINUTES);
+setInterval(scanMempool, ONE_MINUTE);
 setInterval(checkConfirmations, FIVE_MINUTES);
 
 // Export the interval IDs if you need to clear them later
