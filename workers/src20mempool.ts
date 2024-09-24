@@ -17,6 +17,7 @@ interface CachedSRC20Transaction extends SRC20Transaction {
 
 const cache = {
 	cachedSrc20Txs: [] as CachedSRC20Transaction[],
+	errored: [] as string[],
 	totalMempoolTxs: 0 as number,
 	lastCacheTime: 0 as number,
 	mempoolTxsAnalized: 0 as number,
@@ -38,14 +39,17 @@ async function processBatch(
 		analized++;
 		try {
 			const decodedTx = await decodeSRC20Transaction(txid);
-			if (decodedTx) {
+			if (decodedTx !== null && decodedTx !== txid) {
 				newCachedSrc20Txs.push({
 					...decodedTx,
 					timestamp: currentTime,
 				});
+			} else if (decodedTx === txid) {
+				cache.errored.push(txid);
 			}
 		} catch (error) {
 			console.error(`Error decoding transaction ${txid}:`, error);
+			cache.errored.push(txid);
 		}
 	}
 
@@ -114,6 +118,7 @@ interface MempoolInfo {
 	lastCacheTime: string;
 	total: number;
 	mempool: SRC20Transaction[];
+	errored: string[];
 }
 
 export function getCachedSrc20Txs(): MempoolInfo {
@@ -125,6 +130,7 @@ export function getCachedSrc20Txs(): MempoolInfo {
 		}),
 		total: cache.cachedSrc20Txs.length,
 		mempool: cache.cachedSrc20Txs.map(({ timestamp, ...tx }) => tx),
+		errored: cache.errored,
 	};
 }
 

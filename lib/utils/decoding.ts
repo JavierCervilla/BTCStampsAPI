@@ -18,7 +18,7 @@ export interface SRC20Transaction {
 
 export async function decodeSRC20Transaction(
 	txHash: string,
-): Promise<SRC20Transaction | null> {
+): Promise<SRC20Transaction | null | string> {
 	try {
 		// Fetch the transaction details
 		const txDetails = await getTransaction(txHash);
@@ -92,9 +92,8 @@ export async function decodeSRC20Transaction(
 	} catch (error) {
 		console.error("Error decoding data:", error);
 		if (error instanceof HttpError && error.status === 500) {
-			// Retry logic for HTTP 500 errors
-			console.warn("Retrying transaction fetch...");
-			return decodeSRC20Transaction(txHash); // Retry the function
+			console.log("Http Error 500", txHash);
+			return txHash;
 		}
 		return null;
 	}
