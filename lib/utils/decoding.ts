@@ -93,8 +93,13 @@ export async function decodeSRC20Transaction(
 			}, 0) -
 			txDetails.vout
 				.filter(
-					(output: { scriptPubKey: { addresses: string[] } }) =>
-						!output.scriptPubKey.addresses.includes(creator), // Excluir dirección de cambio
+					(output: {
+						scriptPubKey: { addresses?: string[]; address?: string };
+					}) =>
+						!(
+							output.scriptPubKey.addresses?.includes(creator) ||
+							output.scriptPubKey.address === creator
+						),
 				)
 				.reduce((acc: number, output: { value: number }) => {
 					return acc + (Number(output.value) || 0);
