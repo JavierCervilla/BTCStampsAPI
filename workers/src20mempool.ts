@@ -99,7 +99,7 @@ const ONE_MINUTE = 1 * 60 * 1000;
 scanMempool();
 
 // Configuramos los intervalos
-setInterval(scanMempool, FIVE_MINUTES);
+setInterval(scanMempool, ONE_MINUTE);
 setInterval(checkConfirmations, FIVE_MINUTES);
 
 // Export the interval IDs if you need to clear them later
