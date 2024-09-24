@@ -86,32 +86,25 @@ export async function decodeSRC20Transaction(
 			txDetails.vout[0].scriptPubKey.addresses?.[0] ||
 			txDetails.vout[0].scriptPubKey.address;
 
-		const timestamp = new Date(txDetails.time * 1000); // Convert Unix timestamp to Date
+		const timestamp = new Date(txDetails.time * 1000);
+
 		const transactionFee =
 			txDetails.vin.reduce((acc: number, input: { value: number }) => {
 				return acc + (Number(input.value) || 0);
 			}, 0) -
-			txDetails.vout
-				.filter(
-					(output: {
-						scriptPubKey: { addresses?: string[]; address?: string };
-					}) =>
-						!(
-							output.scriptPubKey.addresses?.includes(creator) ||
-							output.scriptPubKey.address === creator
-						),
-				)
-				.reduce((acc: number, output: { value: number }) => {
-					return acc + (Number(output.value) || 0);
-				}, 0) *
-				-1;
+			txDetails.vout.reduce((acc: number, output: { value: number }) => {
+				return acc + (Number(output.value) || 0);
+			}, 0);
+
 		const transactionSize =
 			txDetails.size ||
 			txDetails.vin.length * 148 + txDetails.vout.length * 34 + 10;
+
 		const satsPerVByte =
 			transactionSize > 0
 				? Math.floor((transactionFee * 100000000) / transactionSize)
 				: 0;
+
 		return {
 			tx_hash: txHash,
 			data: JSON.parse(decodedData),
