@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { getCachedSrc20Txs } from "$workers/src20_mempool_scanner.ts";
+import { getCachedSrc20Txs } from "$workers/src20mempool.ts";
 
 export const handler: Handlers = {
 	async GET(req) {
