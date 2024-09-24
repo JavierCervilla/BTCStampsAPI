@@ -1,4 +1,5 @@
 import * as bitcoin from "bitcoinjs-lib";
+import { HttpError } from "@udibo/http-error";
 import { Buffer } from "buffer";
 import { arc4, bin2hex, hex2bin } from "$lib/utils/minting/utils.ts";
 import { zLibUncompress } from "$lib/utils/minting/zlib.ts";
@@ -110,7 +111,7 @@ export async function decodeSRC20Transaction(
 		};
 	} catch (error) {
 		console.error("Error decoding data:", error);
-		if (error instanceof HTTPError && error.status === 500) {
+		if (error instanceof HttpError && error.status === 500) {
 			// Retry logic for HTTP 500 errors
 			console.warn("Retrying transaction fetch...");
 			return decodeSRC20Transaction(txHash); // Retry the function
