@@ -59,7 +59,16 @@ async function processBatch(
 			currentTime - tx.timestamp < CACHE_TTL && mempoolTxs.includes(tx.tx_hash),
 	);
 
-	cache.cachedSrc20Txs = [...validExistingTxs, ...newCachedSrc20Txs];
+	const txMap = new Map<string, CachedSRC20Transaction>();
+	for (const tx of validExistingTxs) {
+		txMap.set(tx.tx_hash, tx);
+	}
+
+	for (const tx of newCachedSrc20Txs) {
+		txMap.set(tx.tx_hash, tx);
+	}
+	cache.cachedSrc20Txs = Array.from(txMap.values());
+
 	cache.mempoolTxsAnalized += analized;
 	console.log(
 		`Processed batch. Updated SRC20 transactions cache. Found ${cache.cachedSrc20Txs.length} transactions.`,
