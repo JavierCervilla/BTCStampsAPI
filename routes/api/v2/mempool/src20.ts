@@ -2,11 +2,31 @@ import type { Handlers } from "$fresh/server.ts";
 import { getCachedSrc20Txs } from "$workers/src20mempool.ts";
 
 export const handler: Handlers = {
-	async GET(_req) {
+	async GET(req) {
 		try {
+			const url = new URL(req.url);
 			const src20Txs = getCachedSrc20Txs();
 
-			return new Response(JSON.stringify(src20Txs), {
+			const params = {
+				address: url.searchParams.getAll("address"),
+				txid: url.searchParams.getAll("txid"),
+				op: url.searchParams.getAll("op").map((op) => op.toLowerCase()),
+				tick: url.searchParams.getAll("tick").map((tick) => tick.toLowerCase()),
+			};
+
+			const filteredTxs = src20Txs.data.filter(
+				(tx) =>
+					(params.address.length === 0 ||
+						params.address.includes(tx.destination) ||
+						params.address.includes(tx.creator)) &&
+					(params.txid.length === 0 || params.txid.includes(tx.tx_hash)) &&
+					(params.op.length === 0 ||
+						params.op.includes(tx.data.op.toLowerCase())) &&
+					(params.tick.length === 0 ||
+						params.tick.includes(tx.data.tick.toLowerCase())),
+			);
+
+			return new Response(JSON.stringify(filteredTxs), {
 				headers: { "Content-Type": "application/json" },
 			});
 		} catch (error) {

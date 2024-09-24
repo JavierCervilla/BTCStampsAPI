@@ -132,7 +132,7 @@ interface MempoolInfo {
 	processed: number;
 	lastCacheTime: string;
 	total: number;
-	mempool: SRC20Transaction[];
+	data: SRC20Transaction[];
 }
 
 export function getCachedSrc20Txs(): MempoolInfo {
@@ -143,7 +143,7 @@ export function getCachedSrc20Txs(): MempoolInfo {
 			timeZone: "Europe/Madrid",
 		}),
 		total: cache.cachedSrc20Txs.length,
-		mempool: cache.cachedSrc20Txs.map(({ timestamp, ...tx }) => tx),
+		data: cache.cachedSrc20Txs.map(({ timestamp, ...tx }) => tx),
 	};
 }
 
@@ -156,5 +156,5 @@ const TWO_MINUTES = 2 * 60 * 1000;
 scanMempool();
 
 // Export the interval IDs if you need to clear them later
-export const scanIntervalId = setInterval(scanMempool, FIVE_MINUTES);
+export const scanIntervalId = setInterval(scanMempool, ONE_MINUTE);
 export const checkIntervalId = setInterval(checkConfirmations, FIVE_MINUTES);

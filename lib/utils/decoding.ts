@@ -11,7 +11,15 @@ const STAMP_PREFIX = "stamp:";
 
 export interface SRC20Transaction {
 	tx_hash: string;
-	data: string;
+	data: {
+		p: string;
+		op: string;
+		tick: string;
+		amt?: number | string;
+		lim?: number | string;
+		max?: number | string;
+		dec?: number | string;
+	};
 	creator: string;
 	destination: string;
 }
