@@ -15,6 +15,9 @@ interface CachedSRC20Transaction extends SRC20Transaction {
 	timestamp: number;
 }
 
+let isScanningMempool = false;
+let isCheckingConfirmations = false;
+
 const cache = {
 	cachedSrc20Txs: [] as CachedSRC20Transaction[],
 	errored: [] as string[],
@@ -76,6 +79,8 @@ async function processBatch(
 }
 
 async function scanMempool() {
+	if (isScanningMempool) return;
+	isScanningMempool = true;
 	try {
 		const mempoolTxs = await getMempoolTransactions();
 		console.log(`Found ${mempoolTxs.length} transactions in mempool.`);
@@ -93,10 +98,14 @@ async function scanMempool() {
 		}
 	} catch (error) {
 		console.error("Error scanning mempool:", error);
+	} finally {
+		isScanningMempool = false;
 	}
 }
 
 async function checkConfirmations() {
+	if (isCheckingConfirmations) return;
+	isCheckingConfirmations = true;
 	const currentTime = Date.now();
 	const txsToCheck = cache.cachedSrc20Txs.filter(
 		(tx) => currentTime - tx.timestamp >= CONFIRMATION_CHECK_INTERVAL,
@@ -117,6 +126,8 @@ async function checkConfirmations() {
 				`Error checking confirmation for transaction ${tx.tx_hash}:`,
 				error,
 			);
+		} finally {
+			isCheckingConfirmations = false;
 		}
 		console.log(`Removed ${confirmedTxs} confirmed transactions.`);
 	}
