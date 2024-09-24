@@ -72,7 +72,7 @@ async function processBatch(
 	cache.cachedSrc20Txs = Array.from(txMap.values());
 
 	const endTime = Date.now();
-	const timeTaken = endTime - startTime / 1000;
+	const timeTaken = (endTime - startTime) / 1000;
 	cache.mempoolTxsAnalized += analized;
 	console.log(
 		`INFO: Processed batch [${startIndex}-${startIndex + BATCH_SIZE}] in ${timeTaken}s. Updated SRC20 transactions cache. Found ${newCachedSrc20Txs.length}/${cache.cachedSrc20Txs.length} new transactions.`,
