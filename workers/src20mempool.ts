@@ -106,7 +106,9 @@ export function getCachedSrc20Txs(): MempoolInfo {
 	return {
 		mempool_size: cache.totalMempoolTxs,
 		analized: cache.mempoolTxsAnalized,
-		lastCacheTime: new Date(cache.lastCacheTime).toLocaleString(),
+		lastCacheTime: new Date(cache.lastCacheTime).toLocaleString("es-ES", {
+			timeZone: "Europe/Madrid",
+		}),
 		total: cache.cachedSrc20Txs.length,
 		mempool: cache.cachedSrc20Txs.map(({ timestamp, ...tx }) => tx),
 	};
