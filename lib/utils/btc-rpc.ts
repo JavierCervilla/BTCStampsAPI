@@ -12,7 +12,7 @@ interface RPCResponse {
 
 export async function bitcoinRPC(
 	method: string,
-	params: any[] = [],
+	params: unknown[] = [],
 ): Promise<RPCResponse> {
 	const response = await fetch(BITCOIN_RPC_URL, {
 		method: "POST",
@@ -22,7 +22,7 @@ export async function bitcoinRPC(
 		},
 		body: JSON.stringify({
 			jsonrpc: "1.0",
-			id: "curltest",
+			id: "deno",
 			method: method,
 			params: params,
 		}),
