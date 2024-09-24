@@ -8,8 +8,8 @@ import {
 } from "$lib/utils/btc.ts";
 
 const BATCH_SIZE = 2500;
-const CACHE_TTL = 30 * 60 * 1000; // 30 minutos en milisegundos
-const CONFIRMATION_CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutos en milisegundos
+const CACHE_TTL = 30 * 60 * 1000;
+const CONFIRMATION_CHECK_INTERVAL = 5 * 60 * 1000;
 
 interface CachedSRC20Transaction extends SRC20Transaction {
 	timestamp: number;
@@ -88,13 +88,6 @@ async function checkConfirmations() {
 export function getCachedSrc20Txs(): CachedSRC20Transaction[] {
 	return cachedSrc20Txs.map(({ timestamp, ...tx }) => tx);
 }
-
-//// Ejecutamos el escaneo inicial inmediatamente
-//scanMempool();
-//
-//// Configuramos los cron jobs
-//Deno.cron("SRC20 Mempool Scanner", "*/5 * * * *", scanMempool);
-//Deno.cron("SRC20 Confirmation Checker", "*/5 * * * *", checkConfirmations);
 
 // Add this instead:
 const FIVE_MINUTES = 5 * 60 * 1000;
