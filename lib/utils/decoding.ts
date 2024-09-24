@@ -3,7 +3,6 @@ import { HttpError } from "@udibo/http-error";
 import { Buffer } from "buffer";
 import { arc4, bin2hex, hex2bin } from "$lib/utils/minting/utils.ts";
 import { zLibUncompress } from "$lib/utils/minting/zlib.ts";
-//import { getTransaction } from "$lib/utils/quicknode.ts";
 import { getTransaction } from "utils/btc.ts";
 import * as msgpack from "msgpack";
 
