@@ -129,23 +129,21 @@ async function checkConfirmations() {
 
 interface MempoolInfo {
 	mempool_size: number;
-	analized: number;
+	processed: number;
 	lastCacheTime: string;
 	total: number;
 	mempool: SRC20Transaction[];
-	errored: string[];
 }
 
 export function getCachedSrc20Txs(): MempoolInfo {
 	return {
 		mempool_size: cache.totalMempoolTxs,
-		analized: cache.mempoolTxsAnalized,
+		processed: cache.mempoolTxsAnalized,
 		lastCacheTime: new Date(cache.lastCacheTime).toLocaleString("es-ES", {
 			timeZone: "Europe/Madrid",
 		}),
 		total: cache.cachedSrc20Txs.length,
 		mempool: cache.cachedSrc20Txs.map(({ timestamp, ...tx }) => tx),
-		errored: cache.errored,
 	};
 }
 
