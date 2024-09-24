@@ -82,7 +82,7 @@ export async function decodeSRC20Transaction(
 
 		return {
 			tx_hash: txHash,
-			data: decodedData,
+			data: JSON.parse(decodedData),
 			creator,
 			destination,
 		};
