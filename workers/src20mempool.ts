@@ -7,7 +7,7 @@ import {
 	isTransactionConfirmed,
 } from "$lib/utils/btc.ts";
 
-const BATCH_SIZE = 100;
+const BATCH_SIZE = 1000;
 const CACHE_TTL = 30 * 60 * 1000; // 30 minutos en milisegundos
 const CONFIRMATION_CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutos en milisegundos
 
@@ -20,7 +20,7 @@ let cachedSrc20Txs: CachedSRC20Transaction[] = [];
 async function scanMempool() {
 	try {
 		const mempoolTxs = await getMempoolTransactions();
-
+		console.log(`Found ${mempoolTxs.length} transactions in mempool.`);
 		const currentTime = Date.now();
 		const newCachedSrc20Txs: CachedSRC20Transaction[] = [];
 
@@ -80,7 +80,7 @@ async function checkConfirmations() {
 	}
 }
 
-export function getCachedSrc20Txs(): SRC20Transaction[] {
+export function getCachedSrc20Txs(): CachedSRC20Transaction[] {
 	return cachedSrc20Txs.map(({ timestamp, ...tx }) => tx);
 }
 
@@ -93,12 +93,13 @@ export function getCachedSrc20Txs(): SRC20Transaction[] {
 
 // Add this instead:
 const FIVE_MINUTES = 5 * 60 * 1000;
+const ONE_MINUTE = 1 * 60 * 1000;
 
 // Ejecutamos el escaneo inicial inmediatamente
 scanMempool();
 
 // Configuramos los intervalos
-setInterval(scanMempool, FIVE_MINUTES);
+setInterval(scanMempool, ONE_MINUTE);
 setInterval(checkConfirmations, FIVE_MINUTES);
 
 // Export the interval IDs if you need to clear them later

@@ -1,8 +1,8 @@
-import { Handlers } from "$fresh/server.ts";
+import type { Handlers } from "$fresh/server.ts";
 import { getCachedSrc20Txs } from "$workers/src20mempool.ts";
 
 export const handler: Handlers = {
-	async GET(req) {
+	async GET(_req) {
 		try {
 			const src20Txs = getCachedSrc20Txs();
 
