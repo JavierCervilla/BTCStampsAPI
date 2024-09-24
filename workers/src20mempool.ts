@@ -123,8 +123,8 @@ async function checkConfirmations() {
 				error,
 			);
 		}
-		console.log(`Removed ${confirmedTxs} confirmed transactions.`);
 	}
+	console.log(`Removed ${confirmedTxs} confirmed transactions.`);
 }
 
 interface MempoolInfo {
