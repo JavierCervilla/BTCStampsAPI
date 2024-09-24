@@ -95,6 +95,7 @@ async function scanMempool() {
 			await processBatch(mempoolTxs, startIndex, currentTime);
 			startIndex += BATCH_SIZE;
 			analized += BATCH_SIZE;
+			cache.mempoolTxsAnalized = analized;
 		}
 	} catch (error) {
 		console.error("Error scanning mempool:", error);
