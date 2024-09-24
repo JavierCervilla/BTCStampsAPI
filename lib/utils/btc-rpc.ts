@@ -15,8 +15,6 @@ export async function bitcoinRPC(
 	params: unknown[] = [],
 ): Promise<RPCResponse> {
 	const AUTH_CODE = `Basic ${btoa(`${BITCOIN_RPC_USER}:${BITCOIN_RPC_PASS}`)}`;
-	console.log("BITCOIN_RPC_URL", BITCOIN_RPC_URL);
-	console.log("AUTH_CODE", AUTH_CODE);
 
 	const response = await fetch(BITCOIN_RPC_URL, {
 		method: "POST",
