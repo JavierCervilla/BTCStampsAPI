@@ -84,9 +84,23 @@ export function getCachedSrc20Txs(): SRC20Transaction[] {
 	return cachedSrc20Txs.map(({ timestamp, ...tx }) => tx);
 }
 
+//// Ejecutamos el escaneo inicial inmediatamente
+//scanMempool();
+//
+//// Configuramos los cron jobs
+//Deno.cron("SRC20 Mempool Scanner", "*/5 * * * *", scanMempool);
+//Deno.cron("SRC20 Confirmation Checker", "*/5 * * * *", checkConfirmations);
+
+// Add this instead:
+const FIVE_MINUTES = 5 * 60 * 1000;
+
 // Ejecutamos el escaneo inicial inmediatamente
 scanMempool();
 
-// Configuramos los cron jobs
-Deno.cron("SRC20 Mempool Scanner", "*/5 * * * *", scanMempool);
-Deno.cron("SRC20 Confirmation Checker", "*/5 * * * *", checkConfirmations);
+// Configuramos los intervalos
+setInterval(scanMempool, FIVE_MINUTES);
+setInterval(checkConfirmations, FIVE_MINUTES);
+
+// Export the interval IDs if you need to clear them later
+export const scanIntervalId = setInterval(scanMempool, FIVE_MINUTES);
+export const checkIntervalId = setInterval(checkConfirmations, FIVE_MINUTES);
