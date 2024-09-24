@@ -7,6 +7,7 @@ Sentry.init({
 	// of transactions for performance monitoring.
 	// We recommend adjusting this value in production
 	tracesSampleRate: 1.0,
+	tracePropagationTargets: ["localhost", /^https:\/\/indexer.srcpad\.pro\/api/],
 });
 
 export const captureException = Sentry.captureException;
