@@ -14,15 +14,16 @@ import manifest from "$/fresh.gen.ts";
 import config from "$/fresh.config.ts";
 // Import for dbManager initialization
 import "./server/database/db.ts";
+import "$workers/src20_mempool_scanner.ts";
 
 // import twindPlugin from "$fresh/plugins/twind.ts";
 // import twindConfig from "./twind.config.ts";
 
 async function startApp() {
-  await start(manifest as unknown as Manifest, config);
+	await start(manifest as unknown as Manifest, config);
 }
 
 startApp().catch((error) => {
-  console.error("Failed to start application:", error);
-  Deno.exit(1);
+	console.error("Failed to start application:", error);
+	Deno.exit(1);
 });

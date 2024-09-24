@@ -1,3 +1,5 @@
+import { bitcoinRPC } from "utils/btc-rpc.ts";
+
 export const getBtcBalance = async (address: string) => {
 	const utxos = await fetch(
 		`https://mempool.space/api/address/${address}/utxo`,
@@ -100,4 +102,72 @@ export async function fetchBTCPrice(): Promise<number> {
 	}
 }
 
-export async function getMempoolTransactions(): promise<string[]> {}
+const CACHE_TTL = 60000; // 1 minuto en milisegundos
+
+let cachedMempoolTxs: string[] | null = null;
+let lastCacheTime = 0;
+
+export async function getMempoolTransactions(): Promise<string[]> {
+	const currentTime = Date.now();
+
+	if (cachedMempoolTxs && currentTime - lastCacheTime < CACHE_TTL) {
+		return cachedMempoolTxs;
+	}
+
+	try {
+		const response = await bitcoinRPC<string[]>("getrawmempool", [false]);
+
+		if (!Array.isArray(response.result)) {
+			throw new Error("Unexpected response format from getrawmempool");
+		}
+
+		cachedMempoolTxs = response.result;
+		lastCacheTime = currentTime;
+
+		return cachedMempoolTxs;
+	} catch (error) {
+		console.error("Error fetching mempool transactions:", error);
+		if (cachedMempoolTxs) {
+			console.warn("Returning expired cached data due to error");
+			return cachedMempoolTxs;
+		}
+		throw error;
+	}
+}
+
+export async function isTransactionConfirmed(txid: string): Promise<boolean> {
+	try {
+		// Primero, verificamos si la transacción aún está en la mempool
+		const mempoolTxs = await getMempoolTransactions();
+		if (mempoolTxs.includes(txid)) {
+			return false; // La transacción aún está en la mempool, por lo tanto no está confirmada
+		}
+
+		// Si no está en la mempool, verificamos si está en la blockchain
+		const response = await bitcoinRPC<{ confirmations?: number }>(
+			"getrawtransaction",
+			[txid, true],
+		);
+
+		// Si la transacción tiene confirmaciones, está confirmada
+		return (
+			response.result.confirmations !== undefined &&
+			response.result.confirmations > 0
+		);
+	} catch (error) {
+		// Si obtenemos un error específico indicando que la transacción no se encontró,
+		// asumimos que ha sido descartada de la mempool sin ser confirmada
+		if (
+			error instanceof Error &&
+			error.message.includes("No such mempool or blockchain transaction")
+		) {
+			return false;
+		}
+
+		console.error(
+			`Error checking transaction confirmation for ${txid}:`,
+			error,
+		);
+		throw error; // Re-lanzamos el error para manejarlo en el nivel superior
+	}
+}

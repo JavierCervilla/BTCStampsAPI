@@ -7,7 +7,17 @@ import * as msgpack from "msgpack";
 
 const STAMP_PREFIX = "stamp:";
 
-export async function decodeSRC20Transaction(txHash: string): Promise<string> {
+export interface SRC20Transaction {
+	tx_hash: string;
+	data: string;
+	creator: string;
+	destination: string;
+	timestamp: Date | number;
+}
+
+export async function decodeSRC20Transaction(
+	txHash: string,
+): Promise<SRC20Transaction | null> {
 	try {
 		// Fetch the transaction details
 		const txDetails = await getTransaction(txHash);
@@ -18,7 +28,7 @@ export async function decodeSRC20Transaction(txHash: string): Promise<string> {
 		);
 
 		if (multisigOutputs.length === 0) {
-			throw new Error("No multisig outputs found in the transaction");
+			return null; // Not an SRC20 transaction
 		}
 
 		let encryptedData = "";
@@ -34,57 +44,49 @@ export async function decodeSRC20Transaction(txHash: string): Promise<string> {
 			encryptedData += chunk1 + chunk2;
 		}
 
-		console.log("Encrypted data:", encryptedData);
-
 		// Decrypt the data using the first input's txid as the key
 		const decryptionKey = txDetails.vin[0].txid;
-		console.log("Decryption key:", decryptionKey);
 		const decryptedData = arc4(hex2bin(decryptionKey), hex2bin(encryptedData));
-
-		console.log("Decrypted data (hex):", bin2hex(decryptedData));
 
 		// Extract the length and actual data
 		const chunkLength = parseInt(bin2hex(decryptedData.slice(0, 2)), 16);
-		console.log("Chunk length:", chunkLength);
 		const chunk = decryptedData.slice(2, 2 + chunkLength);
-
-		console.log("Chunk (hex):", bin2hex(chunk));
 
 		// Check for STAMP prefix
 		const prefix = new TextDecoder().decode(
 			chunk.slice(0, STAMP_PREFIX.length),
 		);
-		console.log("Detected prefix:", prefix);
 
 		if (prefix !== STAMP_PREFIX) {
-			throw new Error("Invalid data format: missing STAMP prefix");
+			return null; // Not an SRC20 transaction
 		}
 
 		const data = chunk.slice(STAMP_PREFIX.length);
-		console.log("Data without prefix (hex):", bin2hex(data));
-
-		// Validate data length
-		const dataLength = chunk.length - STAMP_PREFIX.length;
-		if (dataLength !== chunkLength - STAMP_PREFIX.length) {
-			throw new Error("Invalid data length");
-		}
 
 		// Try to decompress and decode the data
+		let decodedData: string;
 		try {
 			const uncompressedData = await zLibUncompress(data);
-			console.log("Uncompressed data (hex):", bin2hex(uncompressedData));
-
-			// Decode using MessagePack
-			const decodedData = msgpack.decode(uncompressedData);
-			return decodedData;
+			decodedData = msgpack.decode(uncompressedData);
 		} catch (error) {
-			console.warn("Failed to decompress data, raw text output");
-			// If decompression fails, return the data as a string without parsing
-			return new TextDecoder().decode(data).trim();
+			decodedData = new TextDecoder().decode(data).trim();
 		}
+
+		// Extract creator and destination
+		const creator =
+			txDetails.vin[0].address || txDetails.vin[0].scriptSig.asm.split(" ")[1];
+		const destination =
+			txDetails.vout[0].scriptPubKey.addresses?.[0] ||
+			txDetails.vout[0].scriptPubKey.address;
+
+		return {
+			tx_hash: txHash,
+			data: decodedData,
+			creator,
+			destination,
+		};
 	} catch (error) {
 		console.error("Error decoding data:", error);
-		// If all decoding attempts fail, return the data as a string
-		return new TextDecoder().decode(data).trim();
+		return null;
 	}
 }

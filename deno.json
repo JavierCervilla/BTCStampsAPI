@@ -53,7 +53,8 @@
     "$server/": "./server/",
     "bitcoinjs-lib": "npm:bitcoinjs-lib@6.1.6",
     "tiny-secp256k1": "npm:tiny-secp256k1@2.2.3",
-    "msgpack": "https://deno.land/x/msgpack@v1.4/mod.ts"
+    "msgpack": "https://deno.land/x/msgpack@v1.4/mod.ts",
+    "$workers/": "./workers/"
   },
   "compilerOptions": {
     "jsx": "react-jsx",
