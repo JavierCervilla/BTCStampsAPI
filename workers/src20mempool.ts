@@ -15,7 +15,7 @@ interface CachedSRC20Transaction extends SRC20Transaction {
 	timestamp: number;
 }
 
-let cache = {
+const cache = {
 	cachedSrc20Txs: [] as CachedSRC20Transaction[],
 	totalMempoolTxs: 0 as number,
 	lastCacheTime: 0 as number,
@@ -34,7 +34,7 @@ async function scanMempool() {
 		// Procesar nuevas transacciones
 		for (let i = 0; i < Math.min(mempoolTxs.length, BATCH_SIZE); i++) {
 			const txid = mempoolTxs[i];
-			if (cachedSrc20Txs.filter((tx) => tx.tx_hash === txid).length > 0) {
+			if (cache.cachedSrc20Txs.filter((tx) => tx.tx_hash === txid).length > 0) {
 				continue;
 			}
 			analized++;
@@ -61,7 +61,7 @@ async function scanMempool() {
 		cache.cachedSrc20Txs = [...validExistingTxs, ...newCachedSrc20Txs];
 		cache.mempoolTxsAnalized = analized;
 		console.log(
-			`Updated SRC20 transactions cache. Found ${cachedSrc20Txs.length} transactions.`,
+			`Updated SRC20 transactions cache. Found ${cache.cachedSrc20Txs.length} transactions.`,
 		);
 	} catch (error) {
 		console.error("Error scanning mempool:", error);
@@ -70,7 +70,7 @@ async function scanMempool() {
 
 async function checkConfirmations() {
 	const currentTime = Date.now();
-	const txsToCheck = cachedSrc20Txs.filter(
+	const txsToCheck = cache.cachedSrc20Txs.filter(
 		(tx) => currentTime - tx.timestamp >= CONFIRMATION_CHECK_INTERVAL,
 	);
 	let confirmedTxs = 0;
@@ -79,7 +79,7 @@ async function checkConfirmations() {
 		try {
 			const confirmed = await isTransactionConfirmed(tx.tx_hash);
 			if (confirmed) {
-				cachedSrc20Txs = cachedSrc20Txs.filter(
+				cache.cachedSrc20Txs = cache.cachedSrc20Txs.filter(
 					(cachedTx) => cachedTx.tx_hash !== tx.tx_hash,
 				);
 				confirmedTxs++;
