@@ -81,8 +81,8 @@ export async function decodeSRC20Transaction(
 		const creator =
 			txDetails.vin[0].address ||
 			txDetails.vin[0].scriptSig.asm.split(" ")[1] ||
-			txDetails.vout[0].scriptPubKey.addresses?.[0] ||
-			txDetails.vout[0].scriptPubKey.address;
+			txDetails.vout[txDetails.vout.length - 1].scriptPubKey.addresses?.[0] ||
+			txDetails.vout[txDetails.vout.length - 1].scriptPubKey.address;
 		const destination =
 			txDetails.vout[0].scriptPubKey.addresses?.[0] ||
 			txDetails.vout[0].scriptPubKey.address;
