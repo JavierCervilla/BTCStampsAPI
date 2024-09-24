@@ -16,6 +16,7 @@ export interface SRC20Transaction {
 	destination: string;
 	timestamp: Date | number;
 	transactionFee: number;
+	satsPerVByte: number;
 }
 
 export async function decodeSRC20Transaction(
@@ -92,8 +93,13 @@ export async function decodeSRC20Transaction(
 			}, 0) -
 			txDetails.vout.reduce((acc: number, output: { value: number }) => {
 				return acc + (Number(output.value) || 0);
-			}, 0);
-
+			}, 0) *
+				-1;
+		const transactionSize =
+			txDetails.size ||
+			txDetails.vin.length * 148 + txDetails.vout.length * 34 + 10;
+		const satsPerVByte =
+			transactionSize > 0 ? Math.floor(transactionFee / transactionSize) : 0;
 		return {
 			tx_hash: txHash,
 			data: JSON.parse(decodedData),
@@ -101,6 +107,7 @@ export async function decodeSRC20Transaction(
 			destination,
 			timestamp,
 			transactionFee,
+			satsPerVByte,
 		};
 	} catch (error) {
 		console.error("Error decoding data:", error);
