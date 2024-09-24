@@ -15,21 +15,29 @@ interface CachedSRC20Transaction extends SRC20Transaction {
 	timestamp: number;
 }
 
-let cachedSrc20Txs: CachedSRC20Transaction[] = [];
+let cache = {
+	cachedSrc20Txs: [] as CachedSRC20Transaction[],
+	totalMempoolTxs: 0 as number,
+	lastCacheTime: 0 as number,
+	mempoolTxsAnalized: 0 as number,
+};
 
 async function scanMempool() {
 	try {
 		const mempoolTxs = await getMempoolTransactions();
 		console.log(`Found ${mempoolTxs.length} transactions in mempool.`);
 		const currentTime = Date.now();
+		cache.totalMempoolTxs += mempoolTxs.length;
+		cache.lastCacheTime = currentTime;
 		const newCachedSrc20Txs: CachedSRC20Transaction[] = [];
-
+		let analized = 0;
 		// Procesar nuevas transacciones
 		for (let i = 0; i < Math.min(mempoolTxs.length, BATCH_SIZE); i++) {
 			const txid = mempoolTxs[i];
 			if (cachedSrc20Txs.filter((tx) => tx.tx_hash === txid).length > 0) {
 				continue;
 			}
+			analized++;
 			try {
 				const decodedTx = await decodeSRC20Transaction(txid);
 				if (decodedTx) {
@@ -44,13 +52,14 @@ async function scanMempool() {
 		}
 
 		// Mantener transacciones existentes que aún son válidas
-		const validExistingTxs = cachedSrc20Txs.filter(
+		const validExistingTxs = cache.cachedSrc20Txs.filter(
 			(tx) =>
 				currentTime - tx.timestamp < CACHE_TTL &&
 				mempoolTxs.includes(tx.tx_hash),
 		);
 
-		cachedSrc20Txs = [...validExistingTxs, ...newCachedSrc20Txs];
+		cache.cachedSrc20Txs = [...validExistingTxs, ...newCachedSrc20Txs];
+		cache.mempoolTxsAnalized = analized;
 		console.log(
 			`Updated SRC20 transactions cache. Found ${cachedSrc20Txs.length} transactions.`,
 		);
@@ -86,7 +95,12 @@ async function checkConfirmations() {
 }
 
 export function getCachedSrc20Txs(): CachedSRC20Transaction[] {
-	return cachedSrc20Txs.map(({ timestamp, ...tx }) => tx);
+	return {
+		total: cache.totalMempoolTxs,
+		analized: cache.mempoolTxsAnalized,
+		lastCacheTime: cache.lastCacheTime,
+		mempool: cache.cachedSrc20Txs.map(({ timestamp, ...tx }) => tx),
+	};
 }
 
 // Add this instead:
