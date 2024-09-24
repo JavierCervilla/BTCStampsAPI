@@ -90,7 +90,7 @@ export async function decodeSRC20Transaction(
 			destination,
 		};
 	} catch (error) {
-		console.error("Error decoding data:", error);
+		console.error("Error decoding data:", error.message);
 		if (error instanceof HttpError && error.status === 500) {
 			console.log("Http Error 500", txHash);
 			return txHash;
