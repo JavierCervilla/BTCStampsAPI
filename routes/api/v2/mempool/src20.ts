@@ -26,9 +26,17 @@ export const handler: Handlers = {
 						params.tick.includes(tx.data.tick.toLowerCase())),
 			);
 
-			return new Response(JSON.stringify(filteredTxs), {
-				headers: { "Content-Type": "application/json" },
-			});
+			return new Response(
+				JSON.stringify({
+					total: src20Txs.total,
+					processed: src20Txs.processed,
+					mempool_size: src20Txs.mempool_size,
+					data: filteredTxs,
+				}),
+				{
+					headers: { "Content-Type": "application/json" },
+				},
+			);
 		} catch (error) {
 			console.error("Error fetching SRC20 transactions:", error);
 			return new Response(JSON.stringify({ error: "Internal Server Error" }), {
