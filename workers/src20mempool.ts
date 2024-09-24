@@ -7,7 +7,7 @@ import {
 	isTransactionConfirmed,
 } from "$lib/utils/btc.ts";
 
-const BATCH_SIZE = Number.MAX_SAFE_INTEGER; //1000;
+const BATCH_SIZE = 1000;
 const CACHE_TTL = 30 * 60 * 1000; // 30 minutos en milisegundos
 const CONFIRMATION_CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutos en milisegundos
 
@@ -99,7 +99,7 @@ const ONE_MINUTE = 1 * 60 * 1000;
 scanMempool();
 
 // Configuramos los intervalos
-setInterval(scanMempool, ONE_MINUTE);
+setInterval(scanMempool, FIVE_MINUTES);
 setInterval(checkConfirmations, FIVE_MINUTES);
 
 // Export the interval IDs if you need to clear them later
