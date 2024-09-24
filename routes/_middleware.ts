@@ -1,6 +1,6 @@
 import type { FreshContext } from "$fresh/server.ts";
 import { accesslog } from "utils/accesslog.ts";
-import { captureException } from "lib/utils/sentry.ts";
+import { captureException } from "utils/sentry.ts";
 
 export async function handler(req: Request, ctx: FreshContext) {
 	try {
