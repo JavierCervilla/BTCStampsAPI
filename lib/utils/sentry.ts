@@ -9,6 +9,4 @@ Sentry.init({
 	tracesSampleRate: 1.0,
 });
 
-setTimeout(() => {
-	throw new Error();
-});
+export const captureException = Sentry.captureException;
