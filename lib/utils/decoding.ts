@@ -14,6 +14,9 @@ export interface SRC20Transaction {
 	creator: string;
 	destination: string;
 	timestamp: Date | number;
+	transactionFee: number;
+	inputAddresses: string[];
+	outputAddresses: string[];
 }
 
 export async function decodeSRC20Transaction(
@@ -83,11 +86,27 @@ export async function decodeSRC20Transaction(
 			txDetails.vout[0].scriptPubKey.addresses?.[0] ||
 			txDetails.vout[0].scriptPubKey.address;
 
+		const timestamp = new Date(txDetails.time * 1000); // Convert Unix timestamp to Date
+		const transactionFee =
+			txDetails.vin.reduce((acc, input) => acc + input.value, 0) -
+			txDetails.vout.reduce((acc, output) => acc + output.value, 0);
+		const inputAddresses = txDetails.vin.map(
+			(input) => input.address || input.scriptSig.asm.split(" ")[1],
+		);
+		const outputAddresses = txDetails.vout.map(
+			(output) =>
+				output.scriptPubKey.addresses?.[0] || output.scriptPubKey.address,
+		);
+
 		return {
 			tx_hash: txHash,
 			data: JSON.parse(decodedData),
 			creator,
 			destination,
+			timestamp,
+			transactionFee,
+			inputAddresses,
+			outputAddresses,
 		};
 	} catch (error) {
 		console.error("Error decoding data:", error);
