@@ -94,12 +94,13 @@ export function getCachedSrc20Txs(): CachedSRC20Transaction[] {
 // Add this instead:
 const FIVE_MINUTES = 5 * 60 * 1000;
 const ONE_MINUTE = 1 * 60 * 1000;
+const TWO_MINUTES = 2 * 60 * 1000;
 
 // Ejecutamos el escaneo inicial inmediatamente
 scanMempool();
 
 // Configuramos los intervalos
-setInterval(scanMempool, ONE_MINUTE);
+setInterval(scanMempool, TWO_MINUTES);
 setInterval(checkConfirmations, FIVE_MINUTES);
 
 // Export the interval IDs if you need to clear them later

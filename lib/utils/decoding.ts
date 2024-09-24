@@ -88,6 +88,11 @@ export async function decodeSRC20Transaction(
 		};
 	} catch (error) {
 		console.error("Error decoding data:", error);
+		if (error instanceof HTTPError && error.status === 500) {
+			// Retry logic for HTTP 500 errors
+			console.warn("Retrying transaction fetch...");
+			return decodeSRC20Transaction(txHash); // Retry the function
+		}
 		return null;
 	}
 }
