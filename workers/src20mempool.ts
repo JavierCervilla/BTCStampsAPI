@@ -27,6 +27,9 @@ async function scanMempool() {
 		// Procesar nuevas transacciones
 		for (let i = 0; i < Math.min(mempoolTxs.length, BATCH_SIZE); i++) {
 			const txid = mempoolTxs[i];
+			if (cachedSrc20Txs.filter((tx) => tx.tx_hash === txid).length > 0) {
+				continue;
+			}
 			try {
 				const decodedTx = await decodeSRC20Transaction(txid);
 				if (decodedTx) {
