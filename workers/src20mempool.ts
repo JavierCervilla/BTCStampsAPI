@@ -82,6 +82,7 @@ async function scanMempool() {
 		const currentTime = Date.now();
 		cache.totalMempoolTxs = mempoolTxs.length;
 		cache.lastCacheTime = currentTime;
+		cache.mempoolTxsAnalized = 0;
 		let analized = 0;
 
 		let startIndex = 0;
