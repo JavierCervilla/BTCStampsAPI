@@ -32,7 +32,7 @@ let serverConfig: ServerConfig = {
 		PORT: 50001,
 	},
 	BITCOIN: {
-		RPC_URL: "https://indexer.srcpad.pro/btc",
+		RPC_URL: "https://indexer.srcpad.pro/btc/",
 		RPC_USER: "rpc",
 		RPC_PASS: "rpc",
 	},
