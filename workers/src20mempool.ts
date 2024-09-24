@@ -7,7 +7,7 @@ import {
 	isTransactionConfirmed,
 } from "$lib/utils/btc.ts";
 
-const BATCH_SIZE = 2000;
+const BATCH_SIZE = 2500;
 const CACHE_TTL = 30 * 60 * 1000; // 30 minutos en milisegundos
 const CONFIRMATION_CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutos en milisegundos
 
@@ -64,7 +64,8 @@ async function checkConfirmations() {
 	const txsToCheck = cachedSrc20Txs.filter(
 		(tx) => currentTime - tx.timestamp >= CONFIRMATION_CHECK_INTERVAL,
 	);
-
+	let confirmedTxs = 0;
+	console.log(`Checking ${txsToCheck.length} transactions for confirmations.`);
 	for (const tx of txsToCheck) {
 		try {
 			const confirmed = await isTransactionConfirmed(tx.tx_hash);
@@ -72,7 +73,7 @@ async function checkConfirmations() {
 				cachedSrc20Txs = cachedSrc20Txs.filter(
 					(cachedTx) => cachedTx.tx_hash !== tx.tx_hash,
 				);
-				console.log(`Removed confirmed transaction ${tx.tx_hash} from cache.`);
+				confirmedTxs++;
 			}
 		} catch (error) {
 			console.error(
@@ -80,6 +81,7 @@ async function checkConfirmations() {
 				error,
 			);
 		}
+		console.log(`Removed ${confirmedTxs} confirmed transactions.`);
 	}
 }
 
