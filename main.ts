@@ -14,7 +14,7 @@ import manifest from "$/fresh.gen.ts";
 import config from "$/fresh.config.ts";
 // Import for dbManager initialization
 import "./server/database/db.ts";
-import "$workers/src20_mempool_scanner.ts";
+import "$workers/src20mempool.ts";
 
 // import twindPlugin from "$fresh/plugins/twind.ts";
 // import twindConfig from "./twind.config.ts";
