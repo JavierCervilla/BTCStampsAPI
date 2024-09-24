@@ -15,6 +15,7 @@ import config from "$/fresh.config.ts";
 // Import for dbManager initialization
 import "./server/database/db.ts";
 import "$workers/src20mempool.ts";
+import "./lib/utils/sentry.ts";
 
 // import twindPlugin from "$fresh/plugins/twind.ts";
 // import twindConfig from "./twind.config.ts";

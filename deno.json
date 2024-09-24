@@ -10,7 +10,8 @@
     "preview": "deno run -A main.ts",
     "update": "deno run -A -r https://fresh.deno.dev/update .",
     "decode:msig": "deno run -A scripts/decodeSRC20Msig.ts",
-    "decode:olga": "deno run -A scripts/decodeSRC20Olga.ts"
+    "decode:olga": "deno run -A scripts/decodeSRC20Olga.ts",
+    "get:btcinfo": "deno run -A scripts/getBitcoinNodeInfo.ts"
   },
   "lint": { "rules": { "tags": ["fresh", "recommended"] } },
   "exclude": ["**/_fresh/*", "**/server/**/*"],

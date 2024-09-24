@@ -171,3 +171,29 @@ export async function isTransactionConfirmed(txid: string): Promise<boolean> {
 		throw error; // Re-lanzamos el error para manejarlo en el nivel superior
 	}
 }
+
+export async function getBitcoinNodeInfo(): Promise<any> {
+	try {
+		const [networkInfo, mempoolInfo, blockchainInfo] = await Promise.all([
+			bitcoinRPC<any>("getnetworkinfo", []),
+			bitcoinRPC<any>("getmempoolinfo", []),
+			bitcoinRPC<any>("getblockchaininfo", []),
+		]);
+
+		console.log("Network Info:", JSON.stringify(networkInfo.result, null, 2));
+		console.log("Mempool Info:", JSON.stringify(mempoolInfo.result, null, 2));
+		console.log(
+			"Blockchain Info:",
+			JSON.stringify(blockchainInfo.result, null, 2),
+		);
+
+		return {
+			networkInfo: networkInfo.result,
+			mempoolInfo: mempoolInfo.result,
+			blockchainInfo: blockchainInfo.result,
+		};
+	} catch (error) {
+		console.error("Error fetching Bitcoin node info:", error);
+		throw error;
+	}
+}
