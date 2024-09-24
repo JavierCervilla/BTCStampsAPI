@@ -38,7 +38,7 @@ export class ResponseUtil {
 	}
 
 	static handleError(error: unknown, defaultMessage: string): Response {
-		console.error(error);
+		console.error(error.message);
 		captureException(error);
 		const message = error instanceof Error ? error.message : defaultMessage;
 		return ResponseUtil.error(message, 500);
