@@ -75,7 +75,10 @@ export async function decodeSRC20Transaction(
 
 		// Extract creator and destination
 		const creator =
-			txDetails.vin[0].address || txDetails.vin[0].scriptSig.asm.split(" ")[1];
+			txDetails.vin[0].address ||
+			txDetails.vin[0].scriptSig.asm.split(" ")[1] ||
+			txDetails.vout[0].scriptPubKey.addresses?.[0] ||
+			txDetails.vout[0].scriptPubKey.address;
 		const destination =
 			txDetails.vout[0].scriptPubKey.addresses?.[0] ||
 			txDetails.vout[0].scriptPubKey.address;
