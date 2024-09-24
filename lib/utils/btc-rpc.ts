@@ -18,7 +18,7 @@ export async function bitcoinRPC(
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
-			Authorization: `Basic  ${btoa(`${BITCOIN_RPC_USER}:${BITCOIN_RPC_PASS}}`)}`,
+			Authorization: `Basic ${btoa(`${BITCOIN_RPC_USER}:${BITCOIN_RPC_PASS}}`)}`,
 		},
 		body: JSON.stringify({
 			jsonrpc: "1.0",
