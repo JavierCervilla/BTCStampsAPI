@@ -22,6 +22,7 @@ export interface SRC20Transaction {
 	};
 	creator: string;
 	destination: string;
+	type: "msig" | "olga";
 }
 
 export async function decodeSRC20Transaction(
@@ -96,6 +97,7 @@ export async function decodeSRC20Transaction(
 			data: JSON.parse(decodedData),
 			creator,
 			destination,
+			type: "msig",
 		};
 	} catch (error) {
 		console.error("Error decoding data:", error.message);
