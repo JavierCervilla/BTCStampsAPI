@@ -99,7 +99,9 @@ export async function decodeSRC20Transaction(
 			txDetails.size ||
 			txDetails.vin.length * 148 + txDetails.vout.length * 34 + 10;
 		const satsPerVByte =
-			transactionSize > 0 ? Math.floor(transactionFee / transactionSize) : 0;
+			transactionSize > 0
+				? Math.floor((transactionFee * 100000000) / transactionSize)
+				: 0;
 		return {
 			tx_hash: txHash,
 			data: JSON.parse(decodedData),
