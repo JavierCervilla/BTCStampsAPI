@@ -7,7 +7,7 @@ import {
 	isTransactionConfirmed,
 } from "$lib/utils/btc.ts";
 
-const BATCH_SIZE = 5000;
+const BATCH_SIZE = 2000;
 const CACHE_TTL = 30 * 60 * 1000; // 30 minutos en milisegundos
 const CONFIRMATION_CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutos en milisegundos
 
