@@ -14,11 +14,15 @@ export async function bitcoinRPC(
 	method: string,
 	params: unknown[] = [],
 ): Promise<RPCResponse> {
+	const AUTH_CODE = `Basic ${btoa(`${BITCOIN_RPC_USER}:${BITCOIN_RPC_PASS}}`)}`;
+	console.log("BITCOIN_RPC_URL", BITCOIN_RPC_URL);
+	console.log("AUTH_CODE", AUTH_CODE);
+
 	const response = await fetch(BITCOIN_RPC_URL, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
-			Authorization: `Basic ${btoa(`${BITCOIN_RPC_USER}:${BITCOIN_RPC_PASS}}`)}`,
+			Authorization: AUTH_CODE,
 		},
 		body: JSON.stringify({
 			jsonrpc: "1.0",
