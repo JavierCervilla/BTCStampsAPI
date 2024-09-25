@@ -63,7 +63,7 @@ export async function decodeSRC20Transaction(
 			type = "olga";
 		}
 
-		if (decodedData === undefined) {
+		if (!decodedData) {
 			return null;
 		}
 		// Extract creator and destination
