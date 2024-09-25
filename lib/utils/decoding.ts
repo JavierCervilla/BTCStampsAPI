@@ -36,51 +36,36 @@ export async function decodeSRC20Transaction(
 			(output: any) => output.scriptPubKey.type === "multisig",
 		);
 
-		if (multisigOutputs.length === 0) {
-			return null; // Not an SRC20 transaction
-		}
-
-		let encryptedData = "";
-		for (const output of multisigOutputs) {
-			const script = Buffer.from(output.scriptPubKey.hex, "hex");
-			const pubkeys = bitcoin.script
-				.decompile(script)
-				?.slice(1, -2) as Buffer[];
-			if (!pubkeys || pubkeys.length !== 3) continue;
-
-			const chunk1 = pubkeys[0].toString("hex").slice(2, -2);
-			const chunk2 = pubkeys[1].toString("hex").slice(2, -2);
-			encryptedData += chunk1 + chunk2;
-		}
-
-		// Decrypt the data using the first input's txid as the key
-		const decryptionKey = txDetails.vin[0].txid;
-		const decryptedData = arc4(hex2bin(decryptionKey), hex2bin(encryptedData));
-
-		// Extract the length and actual data
-		const chunkLength = parseInt(bin2hex(decryptedData.slice(0, 2)), 16);
-		const chunk = decryptedData.slice(2, 2 + chunkLength);
-
-		// Check for STAMP prefix
-		const prefix = new TextDecoder().decode(
-			chunk.slice(0, STAMP_PREFIX.length),
-		);
-
-		if (prefix !== STAMP_PREFIX) {
-			return null; // Not an SRC20 transaction
-		}
-
-		const data = chunk.slice(STAMP_PREFIX.length);
-
-		// Try to decompress and decode the data
 		let decodedData: string;
-		try {
-			const uncompressedData = await zLibUncompress(data);
-			decodedData = msgpack.decode(uncompressedData);
-		} catch (error) {
-			decodedData = new TextDecoder().decode(data).trim();
+		let type: "msig" | "olga" | null = null;
+		if (multisigOutputs.length > 0) {
+			decodedData = await decodeSRC20MultisigTransaction(
+				txHash,
+				txDetails,
+				multisigOutputs,
+			);
+			type = "msig";
 		}
 
+		// If not multisig, try OLGA
+		const olgaOutputs = txDetails.vout
+			.slice(1)
+			.filter(
+				(output: any) => output.scriptPubKey.type === "witness_v0_scripthash",
+			);
+
+		if (olgaOutputs.length > 0) {
+			decodedData = await decodeSRC20OLGATransaction(
+				txHash,
+				txDetails,
+				olgaOutputs,
+			);
+			type = "olga";
+		}
+
+		if (decodedData === undefined) {
+			return null;
+		}
 		// Extract creator and destination
 		const creator =
 			txDetails.vin[0].address ||
@@ -96,10 +81,101 @@ export async function decodeSRC20Transaction(
 			data: JSON.parse(decodedData),
 			creator,
 			destination,
-			type: "msig",
+			type,
 		};
 	} catch (error) {
 		console.error("Error decoding data:", error.message);
 		return null;
 	}
+}
+
+async function decodeSRC20MultisigTransaction(
+	txHash: string,
+	txDetails: string,
+	multisigOutputs: any[],
+) {
+	let encryptedData = "";
+	for (const output of multisigOutputs) {
+		const script = Buffer.from(output.scriptPubKey.hex, "hex");
+		const pubkeys = bitcoin.script.decompile(script)?.slice(1, -2) as Buffer[];
+		if (!pubkeys || pubkeys.length !== 3) continue;
+
+		const chunk1 = pubkeys[0].toString("hex").slice(2, -2);
+		const chunk2 = pubkeys[1].toString("hex").slice(2, -2);
+		encryptedData += chunk1 + chunk2;
+	}
+
+	// Decrypt the data using the first input's txid as the key
+	const decryptionKey = txDetails.vin[0].txid;
+	const decryptedData = arc4(hex2bin(decryptionKey), hex2bin(encryptedData));
+
+	// Extract the length and actual data
+	const chunkLength = Number.parseInt(bin2hex(decryptedData.slice(0, 2)), 16);
+	const chunk = decryptedData.slice(2, 2 + chunkLength);
+
+	// Check for STAMP prefix
+	const prefix = new TextDecoder().decode(chunk.slice(0, STAMP_PREFIX.length));
+
+	if (prefix !== STAMP_PREFIX) {
+		return null; // Not an SRC20 transaction
+	}
+
+	const data = chunk.slice(STAMP_PREFIX.length);
+
+	// Try to decompress and decode the data
+	let decodedData: string;
+	try {
+		const uncompressedData = await zLibUncompress(data);
+		decodedData = msgpack.decode(uncompressedData);
+	} catch (error) {
+		decodedData = new TextDecoder().decode(data).trim();
+	}
+
+	return decodedData;
+}
+
+async function decodeSRC20OLGATransaction(
+	txHash: string,
+	txDetails: any,
+	olgaOutputs: any[],
+): Promise<SRC20Transaction | null> {
+	let encodedData = "";
+	for (const output of olgaOutputs) {
+		const script = Buffer.from(output.scriptPubKey.hex, "hex");
+		encodedData += script.slice(2).toString("hex");
+	}
+
+	// Remove padding zeros
+	encodedData = encodedData.replace(/0+$/, "");
+
+	// Extract the length prefix (2 bytes)
+	const lengthPrefix = Number.parseInt(encodedData.slice(0, 4), 16);
+
+	// Decode the hex data to a buffer, excluding the length prefix
+	const decodedBuffer = Buffer.from(encodedData.slice(4), "hex").slice(
+		0,
+		lengthPrefix,
+	);
+
+	// Check for STAMP prefix
+	const prefix = decodedBuffer.slice(0, STAMP_PREFIX.length).toString("utf8");
+	if (prefix !== STAMP_PREFIX) {
+		return null; // Not an SRC20 transaction
+	}
+
+	// Remove the STAMP prefix
+	const data = decodedBuffer.slice(STAMP_PREFIX.length);
+
+	// Try to decompress and decode the data
+	let decodedData: string;
+	try {
+		const uncompressedData = await zLibUncompress(data);
+		decodedData = msgpack.decode(uncompressedData);
+	} catch (_error) {
+		// If decompression or msgpack decoding fails, try parsing as JSON
+		const jsonString = data.toString("utf8");
+		decodedData = JSON.parse(jsonString);
+	}
+
+	return decodedData;
 }
