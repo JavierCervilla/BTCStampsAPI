@@ -38,7 +38,6 @@ async function processBatch(
 	const batch = mempoolTxs.slice(startIndex, startIndex + BATCH_SIZE);
 	for (const txid of batch) {
 		if (shouldStop) {
-			console.log("Stopping...");
 			return;
 		}
 		if (cache.cachedSrc20Txs.some((tx) => tx.tx_hash === txid)) {
@@ -160,7 +159,6 @@ export function setupWebSocket() {
 	websocket = new WebSocket(url);
 
 	websocket.onopen = () => {
-		console.log("WebSocket connection established");
 		sendInitMessage();
 		sendWantMessage();
 	};
