@@ -8,7 +8,7 @@ import {
 	setupWebSocket,
 } from "$lib/utils/btc.ts";
 
-const BATCH_SIZE = 100;
+const BATCH_SIZE = 5;
 const CACHE_TTL = 30 * 60 * 1000;
 
 interface CachedSRC20Transaction extends SRC20Transaction {
@@ -83,7 +83,10 @@ async function processBatch(
 }
 
 async function scanMempool() {
-	if (isScanningMempool) return;
+	if (isScanningMempool) {
+		console.log("already scanning");
+		return;
+	}
 	isScanningMempool = true;
 	try {
 		const mempoolTxs = await getMempoolTransactions();
