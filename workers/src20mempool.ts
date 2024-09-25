@@ -5,9 +5,10 @@ import {
 import {
 	getMempoolTransactions,
 	isTransactionConfirmed,
+	setupWebSocket,
 } from "$lib/utils/btc.ts";
 
-const BATCH_SIZE = 1000;
+const BATCH_SIZE = 100;
 const CACHE_TTL = 30 * 60 * 1000;
 
 interface CachedSRC20Transaction extends SRC20Transaction {
@@ -15,6 +16,7 @@ interface CachedSRC20Transaction extends SRC20Transaction {
 }
 
 let isScanningMempool = false;
+let shouldStop = false;
 
 const cache = {
 	cachedSrc20Txs: [] as CachedSRC20Transaction[],
@@ -35,19 +37,21 @@ async function processBatch(
 
 	const batch = mempoolTxs.slice(startIndex, startIndex + BATCH_SIZE);
 	for (const txid of batch) {
+		if (shouldStop) {
+			console.log("Stopping...");
+			return;
+		}
 		if (cache.cachedSrc20Txs.some((tx) => tx.tx_hash === txid)) {
 			continue;
 		}
 		analized++;
 		try {
 			const decodedTx = await decodeSRC20Transaction(txid);
-			if (decodedTx !== null && decodedTx !== txid) {
+			if (decodedTx !== null) {
 				newCachedSrc20Txs.push({
 					...decodedTx,
 					timestamp: currentTime,
 				});
-			} else if (decodedTx === txid) {
-				cache.errored.push(txid);
 			}
 		} catch (error) {
 			console.error(`Error decoding transaction ${txid}:`, error);
@@ -92,7 +96,7 @@ async function scanMempool() {
 		let analized = 0;
 
 		let startIndex = 0;
-		while (startIndex < mempoolTxs.length) {
+		while (startIndex < mempoolTxs.length && !shouldStop) {
 			await processBatch(mempoolTxs, startIndex, currentTime);
 			startIndex += BATCH_SIZE;
 			analized += BATCH_SIZE;
@@ -149,14 +153,77 @@ export function getCachedSrc20Txs(): MempoolInfo {
 	};
 }
 
-// Add this instead:
-const FIVE_MINUTES = 5 * 60 * 1000;
-const ONE_MINUTE = 1 * 60 * 1000;
-const TWO_MINUTES = 2 * 60 * 1000;
+let websocket: WebSocket | null = null;
 
-// Ejecutamos el escaneo inicial inmediatamente
+export function setupWebSocket() {
+	const url = "wss://ws.blockchain.info/inv";
+	websocket = new WebSocket(url);
+
+	websocket.onopen = () => {
+		console.log("WebSocket connection established");
+		sendInitMessage();
+		sendWantMessage();
+	};
+
+	websocket.onmessage = async (event) => {
+		try {
+			const data = JSON.parse(event.data);
+			if (data.op === "block") {
+				console.log("New block detected");
+				shouldStop = true;
+				await checkConfirmations();
+				shouldStop = false;
+				scanMempool();
+			} else if (data.op === "pong") {
+				console.log("Websocket connected.");
+			}
+		} catch (error) {
+			console.error("Error parsing WebSocket message:", error);
+		}
+	};
+
+	websocket.onerror = () => {
+		console.error("WebSocket error");
+	};
+
+	websocket.onclose = () => {
+		console.log("WebSocket connection closed. Reconnecting...");
+		setTimeout(setupWebSocket, 5000);
+	};
+}
+
+function sendInitMessage() {
+	if (websocket && websocket.readyState === WebSocket.OPEN) {
+		const initMessage = { op: "ping" };
+		websocket.send(JSON.stringify(initMessage));
+	}
+}
+
+function sendWantMessage() {
+	if (websocket && websocket.readyState === WebSocket.OPEN) {
+		const wantMessage = {
+			op: "blocks_sub",
+		};
+		websocket.send(JSON.stringify(wantMessage));
+	}
+}
+
+export function closeWebSocket() {
+	if (websocket) {
+		websocket.close();
+		websocket = null;
+	}
+}
+
+// Initialize WebSocket connection
+setupWebSocket();
+
+// Initial mempool scan
 scanMempool();
 
-// Export the interval IDs if you need to clear them later
-export const scanIntervalId = setInterval(scanMempool, ONE_MINUTE);
-export const checkIntervalId = setInterval(checkConfirmations, FIVE_MINUTES);
+// Export a function to manually trigger a mempool scan if needed
+export function triggerMempoolScan() {
+	if (!isScanningMempool) {
+		scanMempool();
+	}
+}
