@@ -12,6 +12,7 @@ export const handler: Handlers = {
 				txid: url.searchParams.getAll("txid"),
 				op: url.searchParams.getAll("op").map((op) => op.toLowerCase()),
 				tick: url.searchParams.getAll("tick").map((tick) => tick.toLowerCase()),
+				type: url.searchParams.getAll("type").map((type) => type.toLowerCase()),
 			};
 
 			const filteredTxs = src20Txs.data.filter(
@@ -23,7 +24,8 @@ export const handler: Handlers = {
 					(params.op.length === 0 ||
 						params.op.includes(tx.data.op.toLowerCase())) &&
 					(params.tick.length === 0 ||
-						params.tick.includes(tx.data.tick.toLowerCase())),
+						params.tick.includes(tx.data.tick.toLowerCase())) &&
+					(params.type.length === 0 || params.type.includes(tx.type)),
 			);
 
 			return new Response(
