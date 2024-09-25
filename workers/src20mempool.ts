@@ -8,7 +8,7 @@ import {
 	setupWebSocket,
 } from "$lib/utils/btc.ts";
 
-const BATCH_SIZE = 5;
+const BATCH_SIZE = 50;
 const CACHE_TTL = 30 * 60 * 1000;
 
 interface CachedSRC20Transaction extends SRC20Transaction {
