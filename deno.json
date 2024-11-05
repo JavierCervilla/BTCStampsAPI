@@ -15,7 +15,7 @@
   },
   "lint": { "rules": { "tags": ["fresh", "recommended"] } },
   "exclude": ["**/_fresh/*", "**/server/**/*"],
-  "nodeModulesDir": true,
+  "nodeModulesDir": "auto",
   "imports": {
     "$/": "./",
     "$Big": "https://esm.sh/big.js@6.2.1",
